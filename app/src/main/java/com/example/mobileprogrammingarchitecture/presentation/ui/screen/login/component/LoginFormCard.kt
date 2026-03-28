@@ -1,4 +1,4 @@
-package com.example.mobileprogrammingarchitecture.presentation.ui.screen.add_habit.component
+package com.example.mobileprogrammingarchitecture.presentation.ui.screen.login.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,13 +11,13 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mobileprogrammingarchitecture.R
@@ -25,16 +25,15 @@ import com.example.mobileprogrammingarchitecture.presentation.theme.AppShapes
 import com.example.mobileprogrammingarchitecture.presentation.theme.HabitTrackerPreviewTheme
 
 @Composable
-fun HabitFormCard(
-    name: String,
-    frequencyInput: String,
-    remindersEnabled: Boolean,
+fun LoginFormCard(
+    email: String,
+    password: String,
     errorMessage: String?,
     canSubmit: Boolean,
-    onNameChange: (String) -> Unit,
-    onFrequencyChange: (String) -> Unit,
-    onReminderToggle: (Boolean) -> Unit,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
     onSubmit: () -> Unit,
+    onGoToRegistration: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val cardPadding = dimensionResource(R.dimen.padding_card)
@@ -57,35 +56,24 @@ fun HabitFormCard(
             verticalArrangement = Arrangement.spacedBy(fieldSpacing)
         ) {
             OutlinedTextField(
-                value = name,
-                onValueChange = onNameChange,
-                label = { Text(stringResource(R.string.add_habit_name_label)) },
+                value = email,
+                onValueChange = onEmailChange,
+                label = { Text(stringResource(R.string.login_email_label)) },
                 modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
                 shape = AppShapes.field,
                 colors = fieldColors
             )
             OutlinedTextField(
-                value = frequencyInput,
-                onValueChange = onFrequencyChange,
-                label = { Text(stringResource(R.string.add_habit_frequency_label)) },
+                value = password,
+                onValueChange = onPasswordChange,
+                label = { Text(stringResource(R.string.login_password_label)) },
                 modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                visualTransformation = PasswordVisualTransformation(),
                 shape = AppShapes.field,
                 colors = fieldColors
             )
-            Column {
-                Text(
-                    stringResource(R.string.add_habit_reminders),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Switch(
-                    checked = remindersEnabled,
-                    onCheckedChange = onReminderToggle,
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = MaterialTheme.colorScheme.primary,
-                        checkedTrackColor = MaterialTheme.colorScheme.primaryContainer
-                    )
-                )
-            }
             if (errorMessage != null) {
                 Text(
                     text = errorMessage,
@@ -103,26 +91,31 @@ fun HabitFormCard(
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
-                Text(stringResource(R.string.add_habit_submit))
+                Text(stringResource(R.string.login_submit))
+            }
+            TextButton(
+                onClick = onGoToRegistration,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.login_go_register))
             }
         }
     }
 }
 
-@Preview(name = "Habit form", showBackground = true)
+@Preview(name = "Login form", showBackground = true)
 @Composable
-private fun HabitFormCardPreview() {
+private fun LoginFormCardPreview() {
     HabitTrackerPreviewTheme {
-        HabitFormCard(
-            name = "Water",
-            frequencyInput = "7",
-            remindersEnabled = true,
+        LoginFormCard(
+            email = "student@habit.app",
+            password = "secret",
             errorMessage = null,
             canSubmit = true,
-            onNameChange = {},
-            onFrequencyChange = {},
-            onReminderToggle = {},
-            onSubmit = {}
+            onEmailChange = {},
+            onPasswordChange = {},
+            onSubmit = {},
+            onGoToRegistration = {}
         )
     }
 }

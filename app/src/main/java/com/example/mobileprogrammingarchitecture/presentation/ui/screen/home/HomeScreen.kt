@@ -1,5 +1,6 @@
 package com.example.mobileprogrammingarchitecture.presentation.ui.screen.home
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,9 +8,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.example.mobileprogrammingarchitecture.presentation.theme.MobileProgrammingArchitectureTheme
+import com.example.mobileprogrammingarchitecture.R
+import com.example.mobileprogrammingarchitecture.presentation.theme.HabitTrackerPreviewTheme
 import com.example.mobileprogrammingarchitecture.presentation.ui.component.ScreenHeader
 import com.example.mobileprogrammingarchitecture.presentation.ui.screen.home.component.HomeStatsCard
 
@@ -20,16 +23,19 @@ fun HomeScreen(
     remindersEnabledCount: Int,
     modifier: Modifier = Modifier
 ) {
+    val screenPadding = dimensionResource(R.dimen.padding_screen)
+    val sectionLarge = dimensionResource(R.dimen.spacing_section_large)
+
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(screenPadding)
     ) {
         ScreenHeader(
-            title = "Habit Tracker",
-            subtitle = "Build consistency with simple daily actions."
+            title = stringResource(R.string.home_title),
+            subtitle = stringResource(R.string.home_subtitle)
         )
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(sectionLarge))
         HomeStatsCard(
             totalHabits = totalHabits,
             longestStreak = longestStreak,
@@ -38,14 +44,26 @@ fun HomeScreen(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(name = "Home", showBackground = true)
 @Composable
 private fun HomeScreenPreview() {
-    MobileProgrammingArchitectureTheme {
+    HabitTrackerPreviewTheme {
         HomeScreen(
             totalHabits = 4,
             longestStreak = 9,
             remindersEnabledCount = 3
+        )
+    }
+}
+
+@Preview(name = "Home — dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun HomeScreenDarkPreview() {
+    HabitTrackerPreviewTheme(darkTheme = true) {
+        HomeScreen(
+            totalHabits = 2,
+            longestStreak = 5,
+            remindersEnabledCount = 1
         )
     }
 }

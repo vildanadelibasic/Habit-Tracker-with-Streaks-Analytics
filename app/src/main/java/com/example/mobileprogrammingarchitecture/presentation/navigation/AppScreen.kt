@@ -1,9 +1,12 @@
 package com.example.mobileprogrammingarchitecture.presentation.navigation
 
-enum class AppScreen(val title: String) {
-    HOME("Home"),
-    HABITS("Habits"),
-    ADD_HABIT("Add Habit"),
-    ANALYTICS("Analytics"),
-    PROFILE("Profile")
+import androidx.annotation.StringRes
+import com.example.mobileprogrammingarchitecture.R
+
+enum class AppScreen(@StringRes val titleRes: Int) {
+    HOME(R.string.nav_home),
+    HABITS(R.string.nav_habits),
+    ADD_HABIT(R.string.nav_add_habit),
+    ANALYTICS(R.string.nav_analytics),
+    PROFILE(R.string.nav_profile)
 }
