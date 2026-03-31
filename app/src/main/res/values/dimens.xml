@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="padding_screen">20dp</dimen>
+    <dimen name="padding_card">16dp</dimen>
+    <dimen name="padding_list_item">14dp</dimen>
+    <dimen name="padding_chip_row_horizontal">12dp</dimen>
+    <dimen name="spacing_section_large">16dp</dimen>
+    <dimen name="spacing_section_medium">12dp</dimen>
+    <dimen name="spacing_section_small">8dp</dimen>
+    <dimen name="spacing_form_fields">10dp</dimen>
+    <dimen name="spacing_chips">8dp</dimen>
+    <dimen name="spacing_header_subtitle">4dp</dimen>
+    <dimen name="padding_nav_vertical">10dp</dimen>
+    <dimen name="selector_row_elevation">1dp</dimen>
+</resources>
