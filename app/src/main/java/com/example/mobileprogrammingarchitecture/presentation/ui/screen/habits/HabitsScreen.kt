@@ -53,14 +53,17 @@ fun HabitsScreen(
             title = stringResource(R.string.habits_title),
             subtitle = stringResource(R.string.habits_subtitle)
         )
+
         FilledTonalButton(
             onClick = onClearAll,
             modifier = Modifier.fillMaxWidth(0.55f)
         ) {
             Text(stringResource(R.string.habits_clear_all))
         }
+
         if (habits.isEmpty()) {
             Spacer(modifier = Modifier.height(sectionSmall))
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -74,6 +77,7 @@ fun HabitsScreen(
                     modifier = Modifier.size(48.dp),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                 )
+
                 Text(
                     text = stringResource(R.string.habits_empty),
                     style = MaterialTheme.typography.bodyMedium,
@@ -82,9 +86,16 @@ fun HabitsScreen(
                 )
             }
         } else {
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(chipSpacing)) {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(chipSpacing)
+            ) {
                 items(habits, key = { it.id }) { habit ->
-                    HabitListItem(habit = habit)
+                    HabitListItem(
+                        habit = habit,
+                        onClick = {
+                            println("Clicked: ${habit.name}")
+                        }
+                    )
                 }
             }
         }
@@ -106,7 +117,10 @@ private fun HabitsScreenPreview() {
 @Composable
 private fun HabitsScreenEmptyPreview() {
     HabitTrackerPreviewTheme {
-        HabitsScreen(habits = emptyList(), onClearAll = {})
+        HabitsScreen(
+            habits = emptyList(),
+            onClearAll = {}
+        )
     }
 }
 
@@ -114,6 +128,9 @@ private fun HabitsScreenEmptyPreview() {
 @Composable
 private fun HabitsScreenDarkPreview() {
     HabitTrackerPreviewTheme(darkTheme = true) {
-        HabitsScreen(habits = PreviewSampleData.habits, onClearAll = {})
+        HabitsScreen(
+            habits = PreviewSampleData.habits,
+            onClearAll = {}
+        )
     }
 }

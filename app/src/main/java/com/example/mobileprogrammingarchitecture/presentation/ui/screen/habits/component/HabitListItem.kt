@@ -1,5 +1,6 @@
 package com.example.mobileprogrammingarchitecture.presentation.ui.screen.habits.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,12 +21,15 @@ import com.example.mobileprogrammingarchitecture.presentation.theme.HabitTracker
 @Composable
 fun HabitListItem(
     habit: Habit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val listItemPadding = dimensionResource(R.dimen.padding_list_item)
 
     OutlinedCard(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         shape = AppShapes.card,
         colors = CardDefaults.outlinedCardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -69,7 +73,8 @@ private fun HabitListItemPreview() {
                 frequencyPerWeek = 7,
                 currentStreak = 4,
                 reminderEnabled = true
-            )
+            ),
+            onClick = {}
         )
     }
 }
