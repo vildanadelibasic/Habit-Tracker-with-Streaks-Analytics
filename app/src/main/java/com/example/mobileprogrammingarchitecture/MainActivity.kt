@@ -1,36 +1,49 @@
 package com.example.mobileprogrammingarchitecture
 
-import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.List
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.mobileprogrammingarchitecture.data.util.Habit
-import com.example.mobileprogrammingarchitecture.presentation.navigation.AppScreen
-import com.example.mobileprogrammingarchitecture.presentation.navigation.AuthScreen
-import com.example.mobileprogrammingarchitecture.presentation.theme.HabitTrackerPreviewTheme
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.mobileprogrammingarchitecture.presentation.navigation.Screen
 import com.example.mobileprogrammingarchitecture.presentation.theme.MobileProgrammingArchitectureTheme
-import com.example.mobileprogrammingarchitecture.presentation.ui.component.ScreenSelectorRow
-import com.example.mobileprogrammingarchitecture.presentation.ui.preview.PreviewSampleData
-import com.example.mobileprogrammingarchitecture.presentation.ui.screen.add_habit.AddHabitScreen
-import com.example.mobileprogrammingarchitecture.presentation.ui.screen.analytics.AnalyticsScreen
-import com.example.mobileprogrammingarchitecture.presentation.ui.screen.habits.HabitsScreen
-import com.example.mobileprogrammingarchitecture.presentation.ui.screen.home.HomeScreen
-import com.example.mobileprogrammingarchitecture.presentation.ui.screen.login.LoginScreen
-import com.example.mobileprogrammingarchitecture.presentation.ui.screen.profile.ProfileScreen
-import com.example.mobileprogrammingarchitecture.presentation.ui.screen.registration.RegistrationScreen
-import com.example.mobileprogrammingarchitecture.presentation.view_model.HabitTrackerUiState
-import com.example.mobileprogrammingarchitecture.presentation.view_model.HabitTrackerViewModel
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.AddHabitScreen
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.HabitDetailsScreen
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.HabitScreen
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitData
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitSampleDefaults
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.HomeScreen
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.profile.ProfileScreen
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,190 +51,175 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MobileProgrammingArchitectureTheme {
-                val vm: HabitTrackerViewModel = viewModel()
-                val uiState by vm.uiState.collectAsState()
+                HabitTrackerRoot()
+            }
+        }
+    }
+}
 
-                if (!uiState.isLoggedIn) {
-                    val loginErr = uiState.loginErrorRes?.let { stringResource(it) }
-                    val regErr = uiState.registrationErrorRes?.let { stringResource(it) }
-                    when (uiState.authScreen) {
-                        AuthScreen.LOGIN -> LoginScreen(
-                            email = uiState.loginEmail,
-                            password = uiState.loginPassword,
-                            errorMessage = loginErr,
-                            canSubmit = vm.canSubmitLogin(),
-                            onEmailChange = vm::onLoginEmailChange,
-                            onPasswordChange = vm::onLoginPasswordChange,
-                            onSubmit = vm::submitLogin,
-                            onGoToRegistration = vm::goToRegistration,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                        AuthScreen.REGISTRATION -> RegistrationScreen(
-                            fullName = uiState.regFullName,
-                            email = uiState.regEmail,
-                            password = uiState.regPassword,
-                            confirmPassword = uiState.regConfirmPassword,
-                            errorMessage = regErr,
-                            canSubmit = vm.canSubmitRegistration(),
-                            onFullNameChange = vm::onRegFullNameChange,
-                            onEmailChange = vm::onRegEmailChange,
-                            onPasswordChange = vm::onRegPasswordChange,
-                            onConfirmPasswordChange = vm::onRegConfirmPasswordChange,
-                            onSubmit = vm::submitRegistration,
-                            onGoToLogin = vm::goToLogin,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-                } else {
-                    val formErr = uiState.formErrorRes?.let { stringResource(it) }
-                    Scaffold(
-                        modifier = Modifier.fillMaxSize(),
-                        topBar = {
-                            ScreenSelectorRow(
-                                selected = uiState.selectedScreen,
-                                onSelected = vm::selectScreen
-                            )
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HabitTrackerRoot() {
+    var habits by remember { mutableStateOf(HabitSampleDefaults.initial) }
+    val navController = rememberNavController()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val showBottomBar = currentRoute == Screen.Home.route ||
+        currentRoute == Screen.Habit.route ||
+        currentRoute == Screen.Profile.route
+
+    val showFab = currentRoute == Screen.Habit.route
+
+    val snackbarAddedMessage = stringResource(R.string.snackbar_habit_added)
+    val snackbarDeletedMessage = stringResource(R.string.snackbar_habit_deleted)
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        floatingActionButton = {
+            if (showFab) {
+                FloatingActionButton(
+                    onClick = {
+                        navController.navigate(Screen.AddHabit.route) {
+                            launchSingleTop = true
                         }
-                    ) { innerPadding ->
-                        HabitTrackerApp(
-                            uiState = uiState,
-                            formErrorMessage = formErr,
-                            onNameChange = vm::onNameInputChange,
-                            onFrequencyChange = vm::onFrequencyInputChange,
-                            onReminderToggle = vm::onReminderToggle,
-                            onSubmitHabit = vm::submitHabit,
-                            canSubmit = vm.canSubmitForm(),
-                            onClearAll = vm::clearAllHabits,
-                            modifier = Modifier.padding(innerPadding)
-                        )
                     }
+                ) {
+                    Icon(
+                        Icons.Filled.Add,
+                        contentDescription = stringResource(R.string.cd_add_habit)
+                    )
+                }
+            }
+        },
+        bottomBar = {
+            if (showBottomBar) {
+                NavigationBar {
+                    NavigationBarItem(
+                        selected = currentRoute == Screen.Home.route,
+                        onClick = {
+                            navController.navigate(Screen.Home.route) {
+                                launchSingleTop = true
+                                restoreState = true
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+                            }
+                        },
+                        icon = { Icon(Icons.Outlined.Home, contentDescription = null) },
+                        label = { Text(stringResource(R.string.nav_home)) }
+                    )
+                    NavigationBarItem(
+                        selected = currentRoute == Screen.Habit.route,
+                        onClick = {
+                            navController.navigate(Screen.Habit.route) {
+                                launchSingleTop = true
+                                restoreState = true
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+                            }
+                        },
+                        icon = { Icon(Icons.Outlined.List, contentDescription = null) },
+                        label = { Text(stringResource(R.string.nav_habits)) }
+                    )
+                    NavigationBarItem(
+                        selected = currentRoute == Screen.Profile.route,
+                        onClick = {
+                            navController.navigate(Screen.Profile.route) {
+                                launchSingleTop = true
+                                restoreState = true
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+                            }
+                        },
+                        icon = { Icon(Icons.Outlined.Person, contentDescription = null) },
+                        label = { Text(stringResource(R.string.nav_profile)) }
+                    )
                 }
             }
         }
-    }
-}
-
-@Composable
-fun HabitTrackerApp(
-    uiState: HabitTrackerUiState,
-    formErrorMessage: String?,
-    onNameChange: (String) -> Unit,
-    onFrequencyChange: (String) -> Unit,
-    onReminderToggle: (Boolean) -> Unit,
-    onSubmitHabit: () -> Unit,
-    canSubmit: Boolean,
-    onClearAll: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    when (uiState.selectedScreen) {
-        AppScreen.HOME -> HomeScreen(
-            totalHabits = uiState.habits.size,
-            longestStreak = uiState.habits.maxOfOrNull { it.currentStreak } ?: 0,
-            remindersEnabledCount = uiState.habits.count { it.reminderEnabled },
-            modifier = modifier
-        )
-
-        AppScreen.HABITS -> HabitsScreen(
-            habits = uiState.habits,
-            onClearAll = onClearAll,
-            modifier = modifier
-        )
-
-        AppScreen.ADD_HABIT -> AddHabitScreen(
-            name = uiState.nameInput,
-            frequencyInput = uiState.frequencyInput,
-            remindersEnabled = uiState.remindersEnabled,
-            errorMessage = formErrorMessage,
-            canSubmit = canSubmit,
-            onNameChange = onNameChange,
-            onFrequencyChange = onFrequencyChange,
-            onReminderToggle = onReminderToggle,
-            onSubmit = onSubmitHabit,
-            modifier = modifier
-        )
-
-        AppScreen.ANALYTICS -> AnalyticsScreen(
-            habits = uiState.habits,
-            modifier = modifier
-        )
-
-        AppScreen.PROFILE -> ProfileScreen(modifier = modifier)
-    }
-}
-
-@Composable
-private fun MainShellPreview(
-    selectedScreen: AppScreen,
-    habits: List<Habit> = PreviewSampleData.habits,
-    darkTheme: Boolean = false
-) {
-    HabitTrackerPreviewTheme(darkTheme = darkTheme) {
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            topBar = {
-                ScreenSelectorRow(
-                    selected = selectedScreen,
-                    onSelected = {}
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = Screen.Home.route,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable(Screen.Home.route) {
+                HomeScreen(
+                    habits = habits,
+                    onOpenHabits = {
+                        navController.navigate(Screen.Habit.route) {
+                            launchSingleTop = true
+                        }
+                    },
+                    onOpenProfile = {
+                        navController.navigate(Screen.Profile.route) {
+                            launchSingleTop = true
+                        }
+                    }
                 )
             }
-        ) { innerPadding ->
-            HabitTrackerApp(
-                uiState = HabitTrackerUiState(
-                    isLoggedIn = true,
-                    selectedScreen = selectedScreen,
-                    habits = habits
-                ),
-                formErrorMessage = null,
-                onNameChange = {},
-                onFrequencyChange = {},
-                onReminderToggle = {},
-                onSubmitHabit = {},
-                canSubmit = true,
-                onClearAll = {},
-                modifier = Modifier.padding(innerPadding)
-            )
+            composable(Screen.Habit.route) {
+                HabitScreen(
+                    habits = habits,
+                    onHabitsChange = { habits = it },
+                    onNavigateToDetails = { h ->
+                        navController.navigate(Screen.HabitDetails.createRoute(h.id, h.title))
+                    }
+                )
+            }
+            composable(Screen.AddHabit.route) {
+                val nextId = (habits.maxOfOrNull { it.id } ?: 0) + 1
+                AddHabitScreen(
+                    nextId = nextId,
+                    onSave = { newHabit: HabitData ->
+                        habits = habits + newHabit
+                        scope.launch {
+                            snackbarHostState.showSnackbar(snackbarAddedMessage)
+                        }
+                        navController.popBackStack()
+                    },
+                    onCancel = { navController.popBackStack() }
+                )
+            }
+            composable(
+                route = Screen.HabitDetails.route,
+                arguments = listOf(
+                    navArgument("id") { type = NavType.IntType },
+                    navArgument("title") { type = NavType.StringType }
+                )
+            ) { entry ->
+                val id = entry.arguments?.getInt("id") ?: return@composable
+                val habit = habits.find { it.id == id }
+                if (habit == null) {
+                    LaunchedEffect(Unit) {
+                        navController.popBackStack()
+                    }
+                    return@composable
+                }
+                HabitDetailsScreen(
+                    habit = habit,
+                    onToggleCompleted = {
+                        habits = habits.map { h ->
+                            if (h.id == id) h.copy(isCompleted = !h.isCompleted) else h
+                        }
+                    },
+                    onDelete = {
+                        habits = habits.filter { it.id != id }
+                        scope.launch {
+                            snackbarHostState.showSnackbar(snackbarDeletedMessage)
+                        }
+                        navController.popBackStack()
+                    }
+                )
+            }
+            composable(Screen.Profile.route) {
+                ProfileScreen()
+            }
         }
     }
-}
-
-@Preview(name = "App shell — Home", showBackground = true)
-@Composable
-private fun PreviewShellHome() {
-    MainShellPreview(selectedScreen = AppScreen.HOME)
-}
-
-@Preview(name = "App shell — Habits", showBackground = true)
-@Composable
-private fun PreviewShellHabits() {
-    MainShellPreview(selectedScreen = AppScreen.HABITS)
-}
-
-@Preview(name = "App shell — Add habit", showBackground = true)
-@Composable
-private fun PreviewShellAddHabit() {
-    MainShellPreview(selectedScreen = AppScreen.ADD_HABIT)
-}
-
-@Preview(name = "App shell — Analytics", showBackground = true)
-@Composable
-private fun PreviewShellAnalytics() {
-    MainShellPreview(selectedScreen = AppScreen.ANALYTICS)
-}
-
-@Preview(name = "App shell — Profile", showBackground = true)
-@Composable
-private fun PreviewShellProfile() {
-    MainShellPreview(selectedScreen = AppScreen.PROFILE)
-}
-
-@Preview(name = "App shell — Habits empty", showBackground = true)
-@Composable
-private fun PreviewShellHabitsEmpty() {
-    MainShellPreview(selectedScreen = AppScreen.HABITS, habits = emptyList())
-}
-
-@Preview(name = "App shell — dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun PreviewShellDark() {
-    MainShellPreview(selectedScreen = AppScreen.HOME, darkTheme = true)
 }

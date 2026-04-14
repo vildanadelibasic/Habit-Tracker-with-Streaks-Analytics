@@ -2,47 +2,83 @@
 <resources>
     <string name="app_name">Habit Tracker</string>
 
-    <!-- Navigation -->
     <string name="nav_home">Home</string>
     <string name="nav_habits">Habits</string>
     <string name="nav_add_habit">Add Habit</string>
     <string name="nav_analytics">Analytics</string>
     <string name="nav_profile">Profile</string>
 
-    <!-- Home -->
     <string name="home_title">Habit Tracker</string>
     <string name="home_subtitle">Build consistency with simple daily actions.</string>
     <string name="home_stats_title">Habit Snapshot</string>
     <string name="home_total_habits">Total habits: %1$d</string>
     <string name="home_longest_streak">Longest streak: %1$d days</string>
     <string name="home_reminders_active">Reminders active: %1$d</string>
+    <string name="home_quick_access">Quick access</string>
+    <string name="home_tips_section">Tips</string>
+    <string name="home_progress_format">Progress: %1$d / %2$d habits</string>
+    <string name="home_shortcut_habits">Habits</string>
+    <string name="home_shortcut_profile">Profile</string>
+    <string-array name="home_tips">
+        <item>One small step each day</item>
+        <item>Water before coffee</item>
+        <item>Short breaks for your eyes</item>
+        <item>Walk after lunch</item>
+    </string-array>
 
-    <!-- Habits -->
     <string name="habits_title">Your Habits</string>
     <string name="habits_subtitle">Overview and current streak status.</string>
+    <string name="habits_empty_list">No habits available</string>
     <string name="habits_clear_all">Clear all habits</string>
     <string name="habits_empty">No habits yet. Add your first habit from Add Habit screen.</string>
+    <string name="habit_status_completed">Done</string>
+    <string name="habit_status_in_progress">In progress</string>
+    <string name="habits_completed_summary">Completed: %1$d of %2$d</string>
+    <string name="habits_search_placeholder">Search…</string>
+    <string name="filter_all">All</string>
+    <string name="filter_active">Active</string>
+    <string name="filter_completed">Completed</string>
     <string name="habit_frequency">Frequency: %1$dx per week</string>
     <string name="habit_streak">Current streak: %1$d days</string>
     <string name="habit_reminder_enabled">Reminder: enabled</string>
     <string name="habit_reminder_disabled">Reminder: disabled</string>
 
-    <!-- Add habit -->
     <string name="add_habit_title">Add Habit</string>
     <string name="add_habit_subtitle">Validation is required before creating a habit.</string>
     <string name="add_habit_name_label">Habit name</string>
     <string name="add_habit_frequency_label">Frequency per week (1-7)</string>
     <string name="add_habit_reminders">Enable reminders</string>
     <string name="add_habit_submit">Add habit</string>
+    <string name="add_habit_screen_title">New habit</string>
+    <string name="label_title">Title</string>
+    <string name="label_description">Description</string>
+    <string name="label_difficulty">Difficulty</string>
+    <string name="difficulty_easy">Easy</string>
+    <string name="difficulty_medium">Medium</string>
+    <string name="difficulty_hard">Hard</string>
+    <string name="daily_habit">Daily habit</string>
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
 
-    <!-- Analytics -->
+    <string name="details_description">Description</string>
+    <string name="details_difficulty">Difficulty</string>
+    <string name="details_type">Type</string>
+    <string name="habit_type_daily">Daily</string>
+    <string name="habit_type_flexible">Flexible</string>
+    <string name="habit_mark_complete">Mark as complete</string>
+    <string name="habit_marked_complete">Marked as complete</string>
+    <string name="details_empty_placeholder">—</string>
+    <string name="cd_add_habit">Add habit</string>
+    <string name="cd_delete_habit">Delete habit</string>
+    <string name="snackbar_habit_added">Habit added</string>
+    <string name="snackbar_habit_deleted">Habit deleted</string>
+
     <string name="analytics_title">Analytics</string>
     <string name="analytics_subtitle">Simple visual stats for your weekly habit plan.</string>
     <string name="analytics_weekly_consistency">Weekly consistency: %1$d%%</string>
     <string name="analytics_avg_frequency">Average planned frequency: %1$d days/week</string>
     <string name="analytics_tip">Tip: Keep one habit simple for guaranteed daily progress.</string>
 
-    <!-- Profile -->
     <string name="profile_title">Profile</string>
     <string name="profile_subtitle">Motivation and account details</string>
     <string name="profile_info_title">Profile Info</string>
@@ -52,8 +88,20 @@
     <string name="profile_demo_name">Student Demo</string>
     <string name="profile_demo_email">student@habit.app</string>
     <string name="profile_demo_role">Habit Builder</string>
+    <string name="profile_tags">Tags</string>
+    <string name="profile_row_student_title">Student</string>
+    <string name="profile_row_student_subtitle">Habit Tracker project</string>
+    <string name="profile_row_version_title">Version</string>
+    <string name="profile_row_version_subtitle">1.0 (UI foundation)</string>
+    <string name="profile_row_theme_title">Theme</string>
+    <string name="profile_row_theme_subtitle">Rose / Material 3</string>
+    <string-array name="profile_tag_labels">
+        <item>Compose</item>
+        <item>Navigation</item>
+        <item>State</item>
+        <item>Material 3</item>
+    </string-array>
 
-    <!-- Login -->
     <string name="login_title">Welcome back</string>
     <string name="login_subtitle">Sign in to continue tracking your habits.</string>
     <string name="login_email_label">Email</string>
@@ -61,7 +109,6 @@
     <string name="login_submit">Sign in</string>
     <string name="login_go_register">Create an account</string>
 
-    <!-- Registration -->
     <string name="register_title">Create account</string>
     <string name="register_subtitle">Register to start building habits.</string>
     <string name="register_name_label">Full name</string>
@@ -71,14 +118,12 @@
     <string name="register_submit">Register</string>
     <string name="register_go_login">Already have an account? Sign in</string>
 
-    <!-- Validation (habits) -->
     <string name="validation_habit_name_required">Habit name is required.</string>
     <string name="validation_habit_name_short">Habit name must have at least 3 characters.</string>
     <string name="validation_frequency_required">Frequency is required.</string>
     <string name="validation_frequency_not_number">Frequency must be a number.</string>
     <string name="validation_frequency_range">Frequency must be between 1 and 7 days per week.</string>
 
-    <!-- Validation (auth) -->
     <string name="validation_email_required">Email is required.</string>
     <string name="validation_email_invalid">Enter a valid email address.</string>
     <string name="validation_password_required">Password is required.</string>

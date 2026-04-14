@@ -6,9 +6,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
-/**
- * Previews use this so the palette matches the real app (dynamic color off).
- */
 @Composable
 fun HabitTrackerPreviewTheme(
     darkTheme: Boolean = false,
