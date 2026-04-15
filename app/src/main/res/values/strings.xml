@@ -19,6 +19,8 @@
     <string name="home_progress_format">Progress: %1$d / %2$d habits</string>
     <string name="home_shortcut_habits">Habits</string>
     <string name="home_shortcut_profile">Profile</string>
+    <string name="home_shortcut_about">About</string>
+    <string name="home_shortcut_settings">Settings</string>
     <string-array name="home_tips">
         <item>One small step each day</item>
         <item>Water before coffee</item>
@@ -38,6 +40,9 @@
     <string name="filter_all">All</string>
     <string name="filter_active">Active</string>
     <string name="filter_completed">Completed</string>
+    <string name="habits_sort_section">Order</string>
+    <string name="habits_sort_default">Default</string>
+    <string name="habits_sort_alphabetical">A–Z</string>
     <string name="habit_frequency">Frequency: %1$dx per week</string>
     <string name="habit_streak">Current streak: %1$d days</string>
     <string name="habit_reminder_enabled">Reminder: enabled</string>
@@ -89,6 +94,18 @@
     <string name="profile_demo_email">student@habit.app</string>
     <string name="profile_demo_role">Habit Builder</string>
     <string name="profile_tags">Tags</string>
+    <string name="profile_nav_about_title">About this app</string>
+    <string name="profile_nav_about_subtitle">Version and purpose</string>
+    <string name="profile_nav_settings_title">Appearance</string>
+    <string name="profile_nav_settings_subtitle">Theme and display</string>
+    <string name="about_title">About</string>
+    <string name="about_body">Habit Tracker helps you stay consistent with small daily actions. Built with Jetpack Compose, Navigation, and a rose-themed Material 3 palette for the Mobile Programming course project.</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_theme_section">Theme</string>
+    <string name="settings_theme_system">Match device</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="cd_navigate_back">Back</string>
     <string name="profile_row_student_title">Student</string>
     <string name="profile_row_student_subtitle">Habit Tracker project</string>
     <string name="profile_row_version_title">Version</string>

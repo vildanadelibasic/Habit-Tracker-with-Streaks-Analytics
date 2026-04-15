@@ -1,7 +1,8 @@
 package com.example.mobileprogrammingarchitecture
 
-import org.junit.Assert.assertEquals
 import org.junit.Test
+
+import org.junit.Assert.*
 
 class ExampleUnitTest {
     @Test

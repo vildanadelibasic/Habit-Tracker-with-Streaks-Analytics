@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
@@ -24,23 +23,45 @@ import com.example.mobileprogrammingarchitecture.presentation.ui.components.prof
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.profile.util.ProfileRowData
 
 @Composable
-fun ProfileScreen(modifier: Modifier = Modifier) {
+fun ProfileScreen(
+    onOpenAbout: () -> Unit,
+    onOpenSettings: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val studentTitle = stringResource(R.string.profile_row_student_title)
     val studentSubtitle = stringResource(R.string.profile_row_student_subtitle)
     val versionTitle = stringResource(R.string.profile_row_version_title)
     val versionSubtitle = stringResource(R.string.profile_row_version_subtitle)
     val themeTitle = stringResource(R.string.profile_row_theme_title)
     val themeSubtitle = stringResource(R.string.profile_row_theme_subtitle)
-    val rows = remember(studentTitle, studentSubtitle, versionTitle, versionSubtitle, themeTitle, themeSubtitle) {
-        listOf(
-            ProfileRowData(1, studentTitle, studentSubtitle),
-            ProfileRowData(2, versionTitle, versionSubtitle),
-            ProfileRowData(3, themeTitle, themeSubtitle)
-        )
-    }
+    val aboutNavTitle = stringResource(R.string.profile_nav_about_title)
+    val aboutNavSubtitle = stringResource(R.string.profile_nav_about_subtitle)
+    val settingsNavTitle = stringResource(R.string.profile_nav_settings_title)
+    val settingsNavSubtitle = stringResource(R.string.profile_nav_settings_subtitle)
+
+    val rows = listOf(
+        ProfileRowData(1, studentTitle, studentSubtitle),
+        ProfileRowData(2, versionTitle, versionSubtitle),
+        ProfileRowData(3, themeTitle, themeSubtitle),
+        ProfileRowData(4, aboutNavTitle, aboutNavSubtitle, onClick = onOpenAbout),
+        ProfileRowData(5, settingsNavTitle, settingsNavSubtitle, onClick = onOpenSettings)
+    )
 
     val tags = stringArrayResource(R.array.profile_tag_labels)
 
+    ProfileScreenContent(
+        rows = rows,
+        tags = tags,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun ProfileScreenContent(
+    rows: List<ProfileRowData>,
+    tags: Array<String>,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -71,7 +92,8 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
             items(rows, key = { it.id }) { row ->
                 ProfileRowItem(
                     title = row.title,
-                    subtitle = row.subtitle
+                    subtitle = row.subtitle,
+                    onClick = row.onClick
                 )
             }
         }
@@ -82,7 +104,10 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
 @Composable
 private fun ProfileScreenPreview() {
     HabitTrackerPreviewTheme {
-        ProfileScreen()
+        ProfileScreen(
+            onOpenAbout = {},
+            onOpenSettings = {}
+        )
     }
 }
 
@@ -90,6 +115,9 @@ private fun ProfileScreenPreview() {
 @Composable
 private fun ProfileScreenDarkPreview() {
     HabitTrackerPreviewTheme(darkTheme = true) {
-        ProfileScreen()
+        ProfileScreen(
+            onOpenAbout = {},
+            onOpenSettings = {}
+        )
     }
 }

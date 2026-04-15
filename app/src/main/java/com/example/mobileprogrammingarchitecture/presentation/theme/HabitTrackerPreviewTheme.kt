@@ -11,7 +11,8 @@ fun HabitTrackerPreviewTheme(
     darkTheme: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    MobileProgrammingArchitectureTheme(darkTheme = darkTheme, dynamicColor = false) {
+    val preference = if (darkTheme) ThemePreference.Dark else ThemePreference.Light
+    MobileProgrammingArchitectureTheme(themePreference = preference, dynamicColor = false) {
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background,

@@ -35,6 +35,47 @@ fun HabitDetailsScreen(
     modifier: Modifier = Modifier
 ) {
     val emptyPlaceholder = stringResource(R.string.details_empty_placeholder)
+    val difficultyLabel = when (habit.difficulty) {
+        HabitDifficulty.Easy -> stringResource(R.string.difficulty_easy)
+        HabitDifficulty.Medium -> stringResource(R.string.difficulty_medium)
+        HabitDifficulty.Hard -> stringResource(R.string.difficulty_hard)
+    }
+    val typeLabel = if (habit.isDaily) {
+        stringResource(R.string.habit_type_daily)
+    } else {
+        stringResource(R.string.habit_type_flexible)
+    }
+    val completionLabel = if (habit.isCompleted) {
+        stringResource(R.string.habit_marked_complete)
+    } else {
+        stringResource(R.string.habit_mark_complete)
+    }
+
+    HabitDetailsScreenContent(
+        habitTitle = habit.title,
+        descriptionValue = habit.description.ifBlank { emptyPlaceholder },
+        difficultyValue = difficultyLabel,
+        typeValue = typeLabel,
+        isCompleted = habit.isCompleted,
+        completionLabel = completionLabel,
+        onToggleCompleted = onToggleCompleted,
+        onDelete = onDelete,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun HabitDetailsScreenContent(
+    habitTitle: String,
+    descriptionValue: String,
+    difficultyValue: String,
+    typeValue: String,
+    isCompleted: Boolean,
+    completionLabel: String,
+    onToggleCompleted: () -> Unit,
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -49,7 +90,7 @@ fun HabitDetailsScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = habit.title,
+                    text = habitTitle,
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.weight(1f)
                 )
@@ -65,38 +106,26 @@ fun HabitDetailsScreen(
         item {
             DetailLabelValueRow(
                 label = stringResource(R.string.details_description),
-                value = habit.description.ifBlank { emptyPlaceholder }
+                value = descriptionValue
             )
         }
         item {
             DetailLabelValueRow(
                 label = stringResource(R.string.details_difficulty),
-                value = when (habit.difficulty) {
-                    HabitDifficulty.Easy -> stringResource(R.string.difficulty_easy)
-                    HabitDifficulty.Medium -> stringResource(R.string.difficulty_medium)
-                    HabitDifficulty.Hard -> stringResource(R.string.difficulty_hard)
-                }
+                value = difficultyValue
             )
         }
         item {
             DetailLabelValueRow(
                 label = stringResource(R.string.details_type),
-                value = if (habit.isDaily) {
-                    stringResource(R.string.habit_type_daily)
-                } else {
-                    stringResource(R.string.habit_type_flexible)
-                }
+                value = typeValue
             )
         }
         item {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(checked = habit.isCompleted, onCheckedChange = { onToggleCompleted() })
+                Checkbox(checked = isCompleted, onCheckedChange = { onToggleCompleted() })
                 Text(
-                    text = if (habit.isCompleted) {
-                        stringResource(R.string.habit_marked_complete)
-                    } else {
-                        stringResource(R.string.habit_mark_complete)
-                    },
+                    text = completionLabel,
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(start = 8.dp)
                 )

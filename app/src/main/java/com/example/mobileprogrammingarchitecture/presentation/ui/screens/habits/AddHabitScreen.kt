@@ -1,6 +1,7 @@
 package com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -47,6 +48,39 @@ fun AddHabitScreen(
         title.isNotBlank()
     }
 
+    AddHabitScreenContent(
+        title = title,
+        onTitleChange = { title = it },
+        description = description,
+        onDescriptionChange = { description = it },
+        difficulty = difficulty,
+        onDifficultyChange = { difficulty = it },
+        isDaily = isDaily,
+        onIsDailyChange = { isDaily = it },
+        isFormValid = isFormValid,
+        nextId = nextId,
+        onSave = onSave,
+        onCancel = onCancel,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun AddHabitScreenContent(
+    title: String,
+    onTitleChange: (String) -> Unit,
+    description: String,
+    onDescriptionChange: (String) -> Unit,
+    difficulty: HabitDifficulty,
+    onDifficultyChange: (HabitDifficulty) -> Unit,
+    isDaily: Boolean,
+    onIsDailyChange: (Boolean) -> Unit,
+    isFormValid: Boolean,
+    nextId: Int,
+    onSave: (HabitData) -> Unit,
+    onCancel: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -63,7 +97,7 @@ fun AddHabitScreen(
         item {
             OutlinedTextField(
                 value = title,
-                onValueChange = { title = it },
+                onValueChange = onTitleChange,
                 label = { Text(stringResource(R.string.label_title)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
@@ -72,7 +106,7 @@ fun AddHabitScreen(
         item {
             OutlinedTextField(
                 value = description,
-                onValueChange = { description = it },
+                onValueChange = onDescriptionChange,
                 label = { Text(stringResource(R.string.label_description)) },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 2
@@ -85,21 +119,21 @@ fun AddHabitScreen(
                     DifficultyOptionRow(
                         label = stringResource(R.string.difficulty_easy),
                         selected = difficulty == HabitDifficulty.Easy,
-                        onSelect = { difficulty = HabitDifficulty.Easy }
+                        onSelect = { onDifficultyChange(HabitDifficulty.Easy) }
                     )
                 }
                 item {
                     DifficultyOptionRow(
                         label = stringResource(R.string.difficulty_medium),
                         selected = difficulty == HabitDifficulty.Medium,
-                        onSelect = { difficulty = HabitDifficulty.Medium }
+                        onSelect = { onDifficultyChange(HabitDifficulty.Medium) }
                     )
                 }
                 item {
                     DifficultyOptionRow(
                         label = stringResource(R.string.difficulty_hard),
                         selected = difficulty == HabitDifficulty.Hard,
-                        onSelect = { difficulty = HabitDifficulty.Hard }
+                        onSelect = { onDifficultyChange(HabitDifficulty.Hard) }
                     )
                 }
             }
@@ -109,7 +143,7 @@ fun AddHabitScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Checkbox(checked = isDaily, onCheckedChange = { isDaily = it })
+                Checkbox(checked = isDaily, onCheckedChange = onIsDailyChange)
                 Text(
                     text = stringResource(R.string.daily_habit),
                     style = MaterialTheme.typography.bodyLarge,

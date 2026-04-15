@@ -12,13 +12,16 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.List
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,14 +32,16 @@ import com.example.mobileprogrammingarchitecture.presentation.ui.components.home
 import com.example.mobileprogrammingarchitecture.presentation.ui.components.home.HomeTipRowItem
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitData
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitSampleDefaults
-import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.util.HomeShortcut
-import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.util.ShortcutTarget
+import com.example.mobileprogrammingarchitecture.presentation.ui.util.HomeShortcut
+import com.example.mobileprogrammingarchitecture.presentation.ui.util.ShortcutTarget
 
 @Composable
 fun HomeScreen(
     habits: List<HabitData>,
     onOpenHabits: () -> Unit,
     onOpenProfile: () -> Unit,
+    onOpenAbout: () -> Unit,
+    onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val completedCount = remember(habits) { habits.count { it.isCompleted } }
@@ -46,15 +51,51 @@ fun HomeScreen(
 
     val habitsShortcutTitle = stringResource(R.string.home_shortcut_habits)
     val profileShortcutTitle = stringResource(R.string.home_shortcut_profile)
-    val shortcuts = remember(habitsShortcutTitle, profileShortcutTitle) {
+    val aboutShortcutTitle = stringResource(R.string.home_shortcut_about)
+    val settingsShortcutTitle = stringResource(R.string.home_shortcut_settings)
+    val shortcuts = remember(
+        habitsShortcutTitle,
+        profileShortcutTitle,
+        aboutShortcutTitle,
+        settingsShortcutTitle
+    ) {
         listOf(
             HomeShortcut(1, habitsShortcutTitle, ShortcutTarget.Habits),
-            HomeShortcut(2, profileShortcutTitle, ShortcutTarget.Profile)
+            HomeShortcut(2, profileShortcutTitle, ShortcutTarget.Profile),
+            HomeShortcut(3, aboutShortcutTitle, ShortcutTarget.About),
+            HomeShortcut(4, settingsShortcutTitle, ShortcutTarget.Settings)
         )
     }
 
     val tips = stringArrayResource(R.array.home_tips)
 
+    HomeScreenContent(
+        completedCount = completedCount,
+        totalHabitCount = habits.size,
+        progress = progress,
+        shortcuts = shortcuts,
+        tips = tips,
+        onOpenHabits = onOpenHabits,
+        onOpenProfile = onOpenProfile,
+        onOpenAbout = onOpenAbout,
+        onOpenSettings = onOpenSettings,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun HomeScreenContent(
+    completedCount: Int,
+    totalHabitCount: Int,
+    progress: Float,
+    shortcuts: List<HomeShortcut>,
+    tips: Array<String>,
+    onOpenHabits: () -> Unit,
+    onOpenProfile: () -> Unit,
+    onOpenAbout: () -> Unit,
+    onOpenSettings: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -74,7 +115,7 @@ fun HomeScreen(
 
         HomeProgressSection(
             completedCount = completedCount,
-            totalCount = habits.size,
+            totalCount = totalHabitCount,
             progress = progress
         )
 
@@ -89,16 +130,21 @@ fun HomeScreen(
             contentPadding = PaddingValues(vertical = 4.dp)
         ) {
             items(shortcuts, key = { it.id }) { shortcut ->
+                val icon: ImageVector = when (shortcut.target) {
+                    ShortcutTarget.Habits -> Icons.Outlined.List
+                    ShortcutTarget.Profile -> Icons.Outlined.FavoriteBorder
+                    ShortcutTarget.About -> Icons.Outlined.Info
+                    ShortcutTarget.Settings -> Icons.Outlined.Settings
+                }
                 HomeShortcutItem(
                     title = shortcut.title,
-                    icon = when (shortcut.target) {
-                        ShortcutTarget.Habits -> Icons.Outlined.List
-                        ShortcutTarget.Profile -> Icons.Outlined.FavoriteBorder
-                    },
+                    icon = icon,
                     onClick = {
                         when (shortcut.target) {
                             ShortcutTarget.Habits -> onOpenHabits()
                             ShortcutTarget.Profile -> onOpenProfile()
+                            ShortcutTarget.About -> onOpenAbout()
+                            ShortcutTarget.Settings -> onOpenSettings()
                         }
                     }
                 )
@@ -152,7 +198,9 @@ private fun HomeScreenPreview() {
         HomeScreen(
             habits = HabitSampleDefaults.initial,
             onOpenHabits = {},
-            onOpenProfile = {}
+            onOpenProfile = {},
+            onOpenAbout = {},
+            onOpenSettings = {}
         )
     }
 }
@@ -164,7 +212,9 @@ private fun HomeScreenDarkPreview() {
         HomeScreen(
             habits = HabitSampleDefaults.initial,
             onOpenHabits = {},
-            onOpenProfile = {}
+            onOpenProfile = {},
+            onOpenAbout = {},
+            onOpenSettings = {}
         )
     }
 }

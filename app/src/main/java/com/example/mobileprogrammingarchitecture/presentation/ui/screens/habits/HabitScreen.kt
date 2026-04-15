@@ -32,6 +32,7 @@ import com.example.mobileprogrammingarchitecture.presentation.ui.components.habi
 import com.example.mobileprogrammingarchitecture.presentation.ui.components.habits.HabitRowItem
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitData
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitSampleDefaults
+import java.util.Locale
 
 private enum class HabitListFilter {
     All,
@@ -48,6 +49,7 @@ fun HabitScreen(
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var listFilter by remember { mutableStateOf(HabitListFilter.All) }
+    var sortAlphabetically by remember { mutableStateOf(false) }
 
     val filteredHabits = remember(habits, searchQuery, listFilter) {
         habits
@@ -61,8 +63,47 @@ fun HabitScreen(
             }
     }
 
+    val displayHabits = remember(filteredHabits, sortAlphabetically) {
+        if (sortAlphabetically) {
+            filteredHabits.sortedBy { it.title.lowercase(Locale.getDefault()) }
+        } else {
+            filteredHabits
+        }
+    }
+
     val completedCount = remember(habits) { habits.count { it.isCompleted } }
 
+    HabitScreenContent(
+        habits = habits,
+        completedCount = completedCount,
+        searchQuery = searchQuery,
+        onSearchQueryChange = { searchQuery = it },
+        listFilter = listFilter,
+        onListFilterChange = { listFilter = it },
+        sortAlphabetically = sortAlphabetically,
+        onSortAlphabeticallyChange = { sortAlphabetically = it },
+        displayHabits = displayHabits,
+        onHabitsChange = onHabitsChange,
+        onNavigateToDetails = onNavigateToDetails,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun HabitScreenContent(
+    habits: List<HabitData>,
+    completedCount: Int,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    listFilter: HabitListFilter,
+    onListFilterChange: (HabitListFilter) -> Unit,
+    sortAlphabetically: Boolean,
+    onSortAlphabeticallyChange: (Boolean) -> Unit,
+    displayHabits: List<HabitData>,
+    onHabitsChange: (List<HabitData>) -> Unit,
+    onNavigateToDetails: (HabitData) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -82,7 +123,7 @@ fun HabitScreen(
 
         OutlinedTextField(
             value = searchQuery,
-            onValueChange = { searchQuery = it },
+            onValueChange = onSearchQueryChange,
             modifier = Modifier.fillMaxWidth(),
             placeholder = { Text(stringResource(R.string.habits_search_placeholder)) },
             leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
@@ -97,26 +138,52 @@ fun HabitScreen(
                 HabitFilterChipItem(
                     label = stringResource(R.string.filter_all),
                     selected = listFilter == HabitListFilter.All,
-                    onClick = { listFilter = HabitListFilter.All }
+                    onClick = { onListFilterChange(HabitListFilter.All) }
                 )
             }
             item {
                 HabitFilterChipItem(
                     label = stringResource(R.string.filter_active),
                     selected = listFilter == HabitListFilter.Active,
-                    onClick = { listFilter = HabitListFilter.Active }
+                    onClick = { onListFilterChange(HabitListFilter.Active) }
                 )
             }
             item {
                 HabitFilterChipItem(
                     label = stringResource(R.string.filter_completed),
                     selected = listFilter == HabitListFilter.Completed,
-                    onClick = { listFilter = HabitListFilter.Completed }
+                    onClick = { onListFilterChange(HabitListFilter.Completed) }
                 )
             }
         }
 
-        if (filteredHabits.isEmpty()) {
+        Text(
+            text = stringResource(R.string.habits_sort_section),
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(0.dp),
+            modifier = Modifier.padding(bottom = 12.dp)
+        ) {
+            item {
+                HabitFilterChipItem(
+                    label = stringResource(R.string.habits_sort_default),
+                    selected = !sortAlphabetically,
+                    onClick = { onSortAlphabeticallyChange(false) }
+                )
+            }
+            item {
+                HabitFilterChipItem(
+                    label = stringResource(R.string.habits_sort_alphabetical),
+                    selected = sortAlphabetically,
+                    onClick = { onSortAlphabeticallyChange(true) }
+                )
+            }
+        }
+
+        if (displayHabits.isEmpty()) {
             HabitsEmptyContent(
                 message = stringResource(R.string.habits_empty_list)
             )
@@ -125,7 +192,7 @@ fun HabitScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 contentPadding = PaddingValues(bottom = 88.dp)
             ) {
-                items(filteredHabits, key = { it.id }) { habit ->
+                items(displayHabits, key = { it.id }) { habit ->
                     HabitRowItem(
                         title = habit.title,
                         isCompleted = habit.isCompleted,
