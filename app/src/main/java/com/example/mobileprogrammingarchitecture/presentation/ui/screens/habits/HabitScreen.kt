@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.TaskAlt
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -21,7 +20,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,14 +29,10 @@ import com.example.mobileprogrammingarchitecture.presentation.theme.HabitTracker
 import com.example.mobileprogrammingarchitecture.presentation.ui.components.habits.HabitFilterChipItem
 import com.example.mobileprogrammingarchitecture.presentation.ui.components.habits.HabitRowItem
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitData
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitListFilter
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitSampleDefaults
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitsEmptyContent
 import java.util.Locale
-
-private enum class HabitListFilter {
-    All,
-    Active,
-    Completed
-}
 
 @Composable
 fun HabitScreen(
@@ -208,32 +202,6 @@ private fun HabitScreenContent(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun HabitsEmptyContent(
-    message: String,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(32.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Icon(
-            imageVector = Icons.Outlined.TaskAlt,
-            contentDescription = null,
-            modifier = Modifier.padding(bottom = 12.dp),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }
 

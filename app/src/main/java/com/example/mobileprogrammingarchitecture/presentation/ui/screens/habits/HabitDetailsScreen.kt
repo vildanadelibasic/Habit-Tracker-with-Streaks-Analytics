@@ -1,7 +1,6 @@
 package com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mobileprogrammingarchitecture.R
 import com.example.mobileprogrammingarchitecture.presentation.theme.HabitTrackerPreviewTheme
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.DetailLabelValueRow
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitData
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitDifficulty
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitSampleDefaults
@@ -131,18 +131,6 @@ private fun HabitDetailsScreenContent(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun DetailLabelValueRow(
-    label: String,
-    value: String,
-    modifier: Modifier = Modifier
-) {
-    Column(modifier = modifier.fillMaxWidth()) {
-        Text(text = label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
-        Text(text = value, style = MaterialTheme.typography.bodyLarge)
     }
 }
 

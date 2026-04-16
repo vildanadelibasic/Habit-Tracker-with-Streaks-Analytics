@@ -8,5 +8,7 @@ data class HomeShortcut(
 
 enum class ShortcutTarget {
     Habits,
-    Profile
+    Profile,
+    About,
+    Settings
 }

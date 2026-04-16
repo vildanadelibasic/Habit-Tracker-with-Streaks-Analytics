@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
@@ -15,7 +14,6 @@ import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,8 +30,9 @@ import com.example.mobileprogrammingarchitecture.presentation.ui.components.home
 import com.example.mobileprogrammingarchitecture.presentation.ui.components.home.HomeTipRowItem
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitData
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitSampleDefaults
-import com.example.mobileprogrammingarchitecture.presentation.ui.util.HomeShortcut
-import com.example.mobileprogrammingarchitecture.presentation.ui.util.ShortcutTarget
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.util.HomeProgressSection
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.util.HomeShortcut
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.util.ShortcutTarget
 
 @Composable
 fun HomeScreen(
@@ -165,29 +164,6 @@ private fun HomeScreenContent(
                 HomeTipRowItem(text = tips[index])
             }
         }
-    }
-}
-
-@Composable
-private fun HomeProgressSection(
-    completedCount: Int,
-    totalCount: Int,
-    progress: Float,
-    modifier: Modifier = Modifier
-) {
-    Column(modifier = modifier.fillMaxWidth()) {
-        Text(
-            text = stringResource(R.string.home_progress_format, completedCount, totalCount),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.primary
-        )
-        LinearProgressIndicator(
-            progress = { progress },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp)
-                .height(8.dp)
-        )
     }
 }
 
