@@ -6,15 +6,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
-/**
- * Previews use this so the palette matches the real app (dynamic color off).
- */
 @Composable
 fun HabitTrackerPreviewTheme(
     darkTheme: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    MobileProgrammingArchitectureTheme(darkTheme = darkTheme, dynamicColor = false) {
+    val preference = if (darkTheme) ThemePreference.Dark else ThemePreference.Light
+    MobileProgrammingArchitectureTheme(themePreference = preference, dynamicColor = false) {
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background,

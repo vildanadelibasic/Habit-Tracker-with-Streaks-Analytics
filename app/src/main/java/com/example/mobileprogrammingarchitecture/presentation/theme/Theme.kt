@@ -50,10 +50,17 @@ private val DarkColorScheme = darkColorScheme(
 
 @Composable
 fun MobileProgrammingArchitectureTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    themePreference: ThemePreference = ThemePreference.System,
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
+    val systemDark = isSystemInDarkTheme()
+    val darkTheme = when (themePreference) {
+        ThemePreference.System -> systemDark
+        ThemePreference.Light -> false
+        ThemePreference.Dark -> true
+    }
+
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
