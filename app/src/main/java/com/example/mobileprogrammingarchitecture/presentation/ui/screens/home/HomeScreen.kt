@@ -1,6 +1,7 @@
 package com.example.mobileprogrammingarchitecture.presentation.ui.screens.home
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -33,7 +34,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mobileprogrammingarchitecture.R
-import com.example.mobileprogrammingarchitecture.data.model.HabitData
 import com.example.mobileprogrammingarchitecture.data.model.HabitSampleDefaults
 import com.example.mobileprogrammingarchitecture.presentation.theme.HabitTrackerPreviewTheme
 import com.example.mobileprogrammingarchitecture.presentation.ui.components.home.HomeShortcutItem
@@ -41,11 +41,11 @@ import com.example.mobileprogrammingarchitecture.presentation.ui.components.home
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.util.HomeProgressSection
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.util.HomeShortcut
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.util.ShortcutTarget
+import com.example.mobileprogrammingarchitecture.presentation.viewmodel.HomeUiState
 
 @Composable
 fun HomeScreen(
-    habits: List<HabitData>,
-    isRefreshing: Boolean,
+    uiState: HomeUiState,
     onRefresh: () -> Unit,
     onOpenHabits: () -> Unit,
     onOpenProfile: () -> Unit,
@@ -53,45 +53,65 @@ fun HomeScreen(
     onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val completedCount = remember(habits) { habits.count { it.isCompleted } }
-    val progress = remember(habits, completedCount) {
-        if (habits.isEmpty()) 0f else completedCount.toFloat() / habits.size
+    when (val s = uiState) {
+        is HomeUiState.Success -> {
+            val habits = s.habits
+            val completedCount = remember(habits) { habits.count { it.isCompleted } }
+            val progress = remember(habits, completedCount) {
+                if (habits.isEmpty()) 0f else completedCount.toFloat() / habits.size
+            }
+
+            val habitsShortcutTitle = stringResource(R.string.home_shortcut_habits)
+            val profileShortcutTitle = stringResource(R.string.home_shortcut_profile)
+            val aboutShortcutTitle = stringResource(R.string.home_shortcut_about)
+            val settingsShortcutTitle = stringResource(R.string.home_shortcut_settings)
+            val shortcuts = remember(
+                habitsShortcutTitle,
+                profileShortcutTitle,
+                aboutShortcutTitle,
+                settingsShortcutTitle
+            ) {
+                listOf(
+                    HomeShortcut(1, habitsShortcutTitle, ShortcutTarget.Habits),
+                    HomeShortcut(2, profileShortcutTitle, ShortcutTarget.Profile),
+                    HomeShortcut(3, aboutShortcutTitle, ShortcutTarget.About),
+                    HomeShortcut(4, settingsShortcutTitle, ShortcutTarget.Settings)
+                )
+            }
+
+            val tips = stringArrayResource(R.array.home_tips)
+
+            HomeScreenContent(
+                isRefreshing = s.isRefreshing,
+                onRefresh = onRefresh,
+                completedCount = completedCount,
+                totalHabitCount = habits.size,
+                progress = progress,
+                shortcuts = shortcuts,
+                tips = tips,
+                onOpenHabits = onOpenHabits,
+                onOpenProfile = onOpenProfile,
+                onOpenAbout = onOpenAbout,
+                onOpenSettings = onOpenSettings,
+                modifier = modifier
+            )
+        }
+        HomeUiState.Init,
+        HomeUiState.Loading ->
+            Box(
+                modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        is HomeUiState.Error ->
+            Box(
+                modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(s.message, style = MaterialTheme.typography.bodyLarge)
+            }
     }
-
-    val habitsShortcutTitle = stringResource(R.string.home_shortcut_habits)
-    val profileShortcutTitle = stringResource(R.string.home_shortcut_profile)
-    val aboutShortcutTitle = stringResource(R.string.home_shortcut_about)
-    val settingsShortcutTitle = stringResource(R.string.home_shortcut_settings)
-    val shortcuts = remember(
-        habitsShortcutTitle,
-        profileShortcutTitle,
-        aboutShortcutTitle,
-        settingsShortcutTitle
-    ) {
-        listOf(
-            HomeShortcut(1, habitsShortcutTitle, ShortcutTarget.Habits),
-            HomeShortcut(2, profileShortcutTitle, ShortcutTarget.Profile),
-            HomeShortcut(3, aboutShortcutTitle, ShortcutTarget.About),
-            HomeShortcut(4, settingsShortcutTitle, ShortcutTarget.Settings)
-        )
-    }
-
-    val tips = stringArrayResource(R.array.home_tips)
-
-    HomeScreenContent(
-        isRefreshing = isRefreshing,
-        onRefresh = onRefresh,
-        completedCount = completedCount,
-        totalHabitCount = habits.size,
-        progress = progress,
-        shortcuts = shortcuts,
-        tips = tips,
-        onOpenHabits = onOpenHabits,
-        onOpenProfile = onOpenProfile,
-        onOpenAbout = onOpenAbout,
-        onOpenSettings = onOpenSettings,
-        modifier = modifier
-    )
 }
 
 @Composable
@@ -213,8 +233,10 @@ private fun HomeScreenContent(
 private fun HomeScreenPreview() {
     HabitTrackerPreviewTheme {
         HomeScreen(
-            habits = HabitSampleDefaults.initial,
-            isRefreshing = false,
+            uiState = HomeUiState.Success(
+                habits = HabitSampleDefaults.initial,
+                isRefreshing = false
+            ),
             onRefresh = {},
             onOpenHabits = {},
             onOpenProfile = {},
@@ -229,8 +251,10 @@ private fun HomeScreenPreview() {
 private fun HomeScreenDarkPreview() {
     HabitTrackerPreviewTheme(darkTheme = true) {
         HomeScreen(
-            habits = HabitSampleDefaults.initial,
-            isRefreshing = false,
+            uiState = HomeUiState.Success(
+                habits = HabitSampleDefaults.initial,
+                isRefreshing = false
+            ),
             onRefresh = {},
             onOpenHabits = {},
             onOpenProfile = {},

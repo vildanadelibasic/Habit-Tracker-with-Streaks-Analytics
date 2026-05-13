@@ -12,7 +12,8 @@ data class HabitData(
     val description: String = "",
     val isCompleted: Boolean = false,
     val difficulty: HabitDifficulty = HabitDifficulty.Medium,
-    val isDaily: Boolean = true
+    val isDaily: Boolean = true,
+    val categoryNames: List<String> = emptyList()
 )
 
 object HabitSampleDefaults {

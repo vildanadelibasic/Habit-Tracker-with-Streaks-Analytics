@@ -5,28 +5,40 @@ import androidx.lifecycle.viewModelScope
 import com.example.mobileprogrammingarchitecture.data.model.HabitData
 import com.example.mobileprogrammingarchitecture.data.model.HabitDifficulty
 import com.example.mobileprogrammingarchitecture.data.repository.HabitRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-data class AddHabitUiState(
-    val title: String = "",
-    val description: String = "",
-    val difficulty: HabitDifficulty = HabitDifficulty.Medium,
-    val isDaily: Boolean = true,
-    val nextId: Int = 1,
-    val isSaving: Boolean = false
-) {
-    val isFormValid: Boolean get() = title.isNotBlank()
+sealed interface AddHabitUiState {
+    data object Init : AddHabitUiState
+    data object Loading : AddHabitUiState
+    data class Ready(
+        val title: String,
+        val description: String,
+        val difficulty: HabitDifficulty,
+        val isDaily: Boolean,
+        val nextId: Int,
+        val isSaving: Boolean
+    ) : AddHabitUiState {
+        val isFormValid: Boolean get() = title.isNotBlank()
+    }
+
+    data class Error(val message: String) : AddHabitUiState
 }
 
-class AddHabitViewModel(
+@HiltViewModel
+class AddHabitViewModel @Inject constructor(
     private val habitRepository: HabitRepository
 ) : ViewModel() {
 
@@ -46,33 +58,38 @@ class AddHabitViewModel(
     private val formDraft = combine(title, description, difficulty, isDaily) { t, d, diff, daily ->
         FormDraft(t, d, diff, daily)
     }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = FormDraft("", "", HabitDifficulty.Medium, true)
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        FormDraft("", "", HabitDifficulty.Medium, true)
     )
+
+    private val _uiState = MutableStateFlow<AddHabitUiState>(AddHabitUiState.Init)
+    val uiState: StateFlow<AddHabitUiState> = _uiState.asStateFlow()
 
     private val _saveCompleted = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val saveCompleted = _saveCompleted.asSharedFlow()
 
-    val uiState: StateFlow<AddHabitUiState> = combine(
-        formDraft,
-        habitRepository.habits,
-        isSaving
-    ) { draft, habits, saving ->
-        val nextId = (habits.maxOfOrNull { it.id } ?: 0) + 1
-        AddHabitUiState(
-            title = draft.title,
-            description = draft.description,
-            difficulty = draft.difficulty,
-            isDaily = draft.isDaily,
-            nextId = nextId,
-            isSaving = saving
-        )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = AddHabitUiState()
-    )
+    init {
+        _uiState.value = AddHabitUiState.Loading
+        combine(
+            formDraft,
+            habitRepository.observeHabits(),
+            isSaving
+        ) { draft, habits, saving ->
+            val nextId = (habits.maxOfOrNull { it.id } ?: 0) + 1
+            AddHabitUiState.Ready(
+                title = draft.title,
+                description = draft.description,
+                difficulty = draft.difficulty,
+                isDaily = draft.isDaily,
+                nextId = nextId,
+                isSaving = saving
+            )
+        }
+            .catch { _uiState.value = AddHabitUiState.Error(it.message ?: "Unknown error") }
+            .onEach { _uiState.value = it }
+            .launchIn(viewModelScope)
+    }
 
     fun setTitle(value: String) {
         title.update { value }
@@ -92,7 +109,7 @@ class AddHabitViewModel(
 
     fun saveHabit() {
         val s = uiState.value
-        if (!s.isFormValid || s.isSaving) return
+        if (s !is AddHabitUiState.Ready || !s.isFormValid || s.isSaving) return
         val habit = HabitData(
             id = s.nextId,
             title = s.title.trim(),
@@ -104,7 +121,7 @@ class AddHabitViewModel(
         viewModelScope.launch {
             isSaving.update { true }
             try {
-                habitRepository.addHabit(habit)
+                habitRepository.insertHabit(habit)
                 _saveCompleted.emit(Unit)
                 title.update { "" }
                 description.update { "" }

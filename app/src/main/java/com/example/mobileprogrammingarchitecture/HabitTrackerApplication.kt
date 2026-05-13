@@ -1,26 +1,26 @@
 package com.example.mobileprogrammingarchitecture
 
 import android.app.Application
-import com.example.mobileprogrammingarchitecture.data.repository.DefaultHabitRepository
-import com.example.mobileprogrammingarchitecture.data.repository.HabitRepository
-import com.example.mobileprogrammingarchitecture.data.repository.PreferencesRepository
-import com.example.mobileprogrammingarchitecture.presentation.di.HabitTrackerViewModelFactory
+import com.example.mobileprogrammingarchitecture.data.model.local.DatabaseSeeder
+import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@HiltAndroidApp
 class HabitTrackerApplication : Application() {
 
-    lateinit var habitRepository: HabitRepository
-        private set
+    @Inject
+    lateinit var databaseSeeder: DatabaseSeeder
 
-    lateinit var preferencesRepository: PreferencesRepository
-        private set
-
-    lateinit var viewModelFactory: HabitTrackerViewModelFactory
-        private set
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onCreate() {
         super.onCreate()
-        habitRepository = DefaultHabitRepository()
-        preferencesRepository = PreferencesRepository()
-        viewModelFactory = HabitTrackerViewModelFactory(habitRepository, preferencesRepository)
+        applicationScope.launch {
+            databaseSeeder.seedIfEmpty()
+        }
     }
 }

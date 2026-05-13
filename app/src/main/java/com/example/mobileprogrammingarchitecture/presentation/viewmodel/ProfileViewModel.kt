@@ -3,30 +3,40 @@ package com.example.mobileprogrammingarchitecture.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mobileprogrammingarchitecture.data.repository.HabitRepository
-import kotlinx.coroutines.flow.SharingStarted
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
-data class ProfileUiState(
-    val totalHabits: Int = 0,
-    val completedHabits: Int = 0
-)
+sealed interface ProfileUiState {
+    data object Init : ProfileUiState
+    data object Loading : ProfileUiState
+    data class Success(val totalHabits: Int, val completedHabits: Int) : ProfileUiState
+    data class Error(val message: String) : ProfileUiState
+}
 
-class ProfileViewModel(
+@HiltViewModel
+class ProfileViewModel @Inject constructor(
     habitRepository: HabitRepository
 ) : ViewModel() {
 
-    val uiState: StateFlow<ProfileUiState> = habitRepository.habits
-        .map { habits ->
-            ProfileUiState(
-                totalHabits = habits.size,
-                completedHabits = habits.count { it.isCompleted }
-            )
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = ProfileUiState()
-        )
+    private val _uiState = MutableStateFlow<ProfileUiState>(ProfileUiState.Init)
+    val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
+
+    init {
+        _uiState.value = ProfileUiState.Loading
+        habitRepository.observeHabits()
+            .catch { _uiState.value = ProfileUiState.Error(it.message ?: "Unknown error") }
+            .onEach { habits ->
+                _uiState.value = ProfileUiState.Success(
+                    totalHabits = habits.size,
+                    completedHabits = habits.count { it.isCompleted }
+                )
+            }
+            .launchIn(viewModelScope)
+    }
 }

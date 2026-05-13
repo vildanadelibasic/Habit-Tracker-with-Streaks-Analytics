@@ -1,69 +1,82 @@
 package com.example.mobileprogrammingarchitecture.presentation.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.mobileprogrammingarchitecture.data.model.HabitData
 import com.example.mobileprogrammingarchitecture.data.repository.HabitRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-data class HabitDetailsUiState(
-    val habit: HabitData? = null,
-    val hasResolved: Boolean = false,
-    val wasEverPresent: Boolean = false,
-    val isMutationInProgress: Boolean = false
-)
+sealed interface HabitDetailsUiState {
+    data object Init : HabitDetailsUiState
+    data object Loading : HabitDetailsUiState
+    data class Ready(val habit: HabitData, val isMutationInProgress: Boolean) : HabitDetailsUiState
+    data object NotFound : HabitDetailsUiState
+    data class Error(val message: String) : HabitDetailsUiState
+}
 
 sealed interface HabitDetailsEffect {
     data object Deleted : HabitDetailsEffect
 }
 
-class HabitDetailsViewModel(
-    private val habitId: Int,
+@HiltViewModel
+class HabitDetailsViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val habitRepository: HabitRepository
 ) : ViewModel() {
 
-    private var sawHabitInRepository = false
+    private val habitId: Int = savedStateHandle.get<Int>("id") ?: -1
 
     private val pendingMutations = MutableStateFlow(0)
 
     private val _effects = MutableSharedFlow<HabitDetailsEffect>(extraBufferCapacity = 1)
     val effects = _effects.asSharedFlow()
 
-    val uiState: StateFlow<HabitDetailsUiState> = combine(
-        habitRepository.habits,
-        pendingMutations
-    ) { list, pending ->
-        val habit = list.find { it.id == habitId }
-        if (habit != null) sawHabitInRepository = true
-        HabitDetailsUiState(
-            habit = habit,
-            hasResolved = true,
-            wasEverPresent = sawHabitInRepository,
-            isMutationInProgress = pending > 0
-        )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = HabitDetailsUiState()
-    )
+    private val _uiState = MutableStateFlow<HabitDetailsUiState>(HabitDetailsUiState.Init)
+    val uiState: StateFlow<HabitDetailsUiState> = _uiState.asStateFlow()
+
+    init {
+        _uiState.value = HabitDetailsUiState.Loading
+        combine(
+            habitRepository.observeHabits(),
+            habitRepository.observeHabit(habitId),
+            pendingMutations
+        ) { habits, habitOpt, pending ->
+            val habit = habitOpt ?: habits.find { it.id == habitId }
+            when {
+                habit != null -> HabitDetailsUiState.Ready(
+                    habit = habit,
+                    isMutationInProgress = pending > 0
+                )
+                habits.isNotEmpty() && habits.none { it.id == habitId } -> HabitDetailsUiState.NotFound
+                else -> HabitDetailsUiState.Loading
+            }
+        }
+            .catch { _uiState.value = HabitDetailsUiState.Error(it.message ?: "Unknown error") }
+            .onEach { _uiState.value = it }
+            .launchIn(viewModelScope)
+    }
 
     fun toggleCompleted() {
         viewModelScope.launch {
             pendingMutations.update { it + 1 }
             try {
-                habitRepository.updateHabits { list ->
-                    list.map { h ->
-                        if (h.id == habitId) h.copy(isCompleted = !h.isCompleted) else h
-                    }
+                val habit = habitRepository.observeHabit(habitId).first()
+                if (habit != null) {
+                    habitRepository.setHabitCompleted(habitId, !habit.isCompleted)
                 }
             } finally {
                 pendingMutations.update { (it - 1).coerceAtLeast(0) }
@@ -75,25 +88,11 @@ class HabitDetailsViewModel(
         viewModelScope.launch {
             pendingMutations.update { it + 1 }
             try {
-                habitRepository.removeHabit(habitId)
+                habitRepository.deleteHabit(habitId)
                 _effects.emit(HabitDetailsEffect.Deleted)
             } finally {
                 pendingMutations.update { (it - 1).coerceAtLeast(0) }
             }
         }
-    }
-}
-
-class HabitDetailsViewModelFactory(
-    private val habitId: Int,
-    private val habitRepository: HabitRepository
-) : ViewModelProvider.Factory {
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(HabitDetailsViewModel::class.java)) {
-            return HabitDetailsViewModel(habitId, habitRepository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }
 }

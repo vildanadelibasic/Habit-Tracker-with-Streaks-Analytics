@@ -26,6 +26,7 @@ import com.example.mobileprogrammingarchitecture.presentation.theme.HabitTracker
 @Composable
 fun AboutScreen(
     habitsInRepository: Int,
+    completionLogCount: Int,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -33,6 +34,7 @@ fun AboutScreen(
     AboutScreenContent(
         bodyText = body,
         repositoryHint = stringResource(R.string.about_repository_hint, habitsInRepository),
+        completionHint = stringResource(R.string.about_completion_logs_hint, completionLogCount),
         onBack = onBack,
         modifier = modifier
     )
@@ -43,6 +45,7 @@ fun AboutScreen(
 private fun AboutScreenContent(
     bodyText: String,
     repositoryHint: String,
+    completionHint: String,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -82,6 +85,12 @@ private fun AboutScreenContent(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 16.dp)
             )
+            Text(
+                text = completionHint,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 8.dp)
+            )
         }
     }
 }
@@ -90,6 +99,6 @@ private fun AboutScreenContent(
 @Composable
 private fun AboutScreenPreview() {
     HabitTrackerPreviewTheme {
-        AboutScreen(habitsInRepository = 7, onBack = {})
+        AboutScreen(habitsInRepository = 7, completionLogCount = 2, onBack = {})
     }
 }

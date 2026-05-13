@@ -3,24 +3,44 @@ package com.example.mobileprogrammingarchitecture.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mobileprogrammingarchitecture.data.repository.HabitRepository
-import kotlinx.coroutines.flow.SharingStarted
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
-data class AboutUiState(
-    val habitsInRepository: Int = 0
-)
+sealed interface AboutUiState {
+    data object Init : AboutUiState
+    data object Loading : AboutUiState
+    data class Success(val habitsInRepository: Int, val completionLogCount: Int) : AboutUiState
+    data class Error(val message: String) : AboutUiState
+}
 
-class AboutViewModel(
-    habitRepository: HabitRepository
+@HiltViewModel
+class AboutViewModel @Inject constructor(
+    private val habitRepository: HabitRepository
 ) : ViewModel() {
 
-    val uiState: StateFlow<AboutUiState> = habitRepository.habits
-        .map { habits -> AboutUiState(habitsInRepository = habits.size) }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = AboutUiState()
-        )
+    private val _uiState = MutableStateFlow<AboutUiState>(AboutUiState.Init)
+    val uiState: StateFlow<AboutUiState> = _uiState.asStateFlow()
+
+    init {
+        _uiState.value = AboutUiState.Loading
+        combine(
+            habitRepository.observeHabits(),
+            habitRepository.observeCompletionLogCount()
+        ) { habits, logCount ->
+            AboutUiState.Success(
+                habitsInRepository = habits.size,
+                completionLogCount = logCount
+            )
+        }
+            .catch { _uiState.value = AboutUiState.Error(it.message ?: "Unknown error") }
+            .onEach { _uiState.value = it }
+            .launchIn(viewModelScope)
+    }
 }

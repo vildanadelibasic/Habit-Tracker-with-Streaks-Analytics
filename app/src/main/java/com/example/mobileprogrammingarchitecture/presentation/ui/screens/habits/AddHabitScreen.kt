@@ -28,7 +28,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mobileprogrammingarchitecture.R
 import com.example.mobileprogrammingarchitecture.data.model.HabitDifficulty
 import com.example.mobileprogrammingarchitecture.presentation.theme.HabitTrackerPreviewTheme
+import com.example.mobileprogrammingarchitecture.presentation.viewmodel.AddHabitUiState
 import com.example.mobileprogrammingarchitecture.presentation.viewmodel.AddHabitViewModel
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.CircularProgressIndicator
 
 @Composable
 fun AddHabitScreen(
@@ -43,21 +46,33 @@ fun AddHabitScreen(
             onSaveSuccess()
         }
     }
-    AddHabitScreenContent(
-        title = uiState.title,
-        onTitleChange = viewModel::setTitle,
-        description = uiState.description,
-        onDescriptionChange = viewModel::setDescription,
-        difficulty = uiState.difficulty,
-        onDifficultyChange = viewModel::setDifficulty,
-        isDaily = uiState.isDaily,
-        onIsDailyChange = viewModel::setIsDaily,
-        isFormValid = uiState.isFormValid,
-        isSaving = uiState.isSaving,
-        onSaveClick = { viewModel.saveHabit() },
-        onCancel = onCancel,
-        modifier = modifier
-    )
+    when (val s = uiState) {
+        is AddHabitUiState.Ready ->
+            AddHabitScreenContent(
+                title = s.title,
+                onTitleChange = viewModel::setTitle,
+                description = s.description,
+                onDescriptionChange = viewModel::setDescription,
+                difficulty = s.difficulty,
+                onDifficultyChange = viewModel::setDifficulty,
+                isDaily = s.isDaily,
+                onIsDailyChange = viewModel::setIsDaily,
+                isFormValid = s.isFormValid,
+                isSaving = s.isSaving,
+                onSaveClick = { viewModel.saveHabit() },
+                onCancel = onCancel,
+                modifier = modifier
+            )
+        AddHabitUiState.Init,
+        AddHabitUiState.Loading ->
+            Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        is AddHabitUiState.Error ->
+            Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(s.message)
+            }
+    }
 }
 
 @Composable

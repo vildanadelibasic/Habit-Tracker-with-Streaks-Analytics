@@ -1,6 +1,7 @@
 package com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,12 +12,14 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,21 +44,33 @@ fun HabitScreen(
     onNavigateToDetails: (HabitData) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    HabitScreenContent(
-        habits = uiState.habits,
-        completedCount = uiState.completedCount,
-        isWriteInProgress = uiState.isWriteInProgress,
-        searchQuery = uiState.searchQuery,
-        onSearchQueryChange = onSearchQueryChange,
-        listFilter = uiState.listFilter,
-        onListFilterChange = onListFilterChange,
-        sortAlphabetically = uiState.sortAlphabetically,
-        onSortAlphabeticallyChange = onSortAlphabeticallyChange,
-        displayHabits = uiState.displayHabits,
-        onToggleHabitCompleted = onToggleHabitCompleted,
-        onNavigateToDetails = onNavigateToDetails,
-        modifier = modifier
-    )
+    when (val s = uiState) {
+        is HabitsUiState.Success ->
+            HabitScreenContent(
+                habits = s.habits,
+                completedCount = s.completedCount,
+                isWriteInProgress = s.isWriteInProgress,
+                searchQuery = s.searchQuery,
+                onSearchQueryChange = onSearchQueryChange,
+                listFilter = s.listFilter,
+                onListFilterChange = onListFilterChange,
+                sortAlphabetically = s.sortAlphabetically,
+                onSortAlphabeticallyChange = onSortAlphabeticallyChange,
+                displayHabits = s.displayHabits,
+                onToggleHabitCompleted = onToggleHabitCompleted,
+                onNavigateToDetails = onNavigateToDetails,
+                modifier = modifier
+            )
+        HabitsUiState.Init,
+        HabitsUiState.Loading ->
+            Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        is HabitsUiState.Error ->
+            Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(s.message)
+            }
+    }
 }
 
 @Composable
@@ -197,7 +212,7 @@ private fun HabitScreenPreview() {
     val filtered = sample.filter { it.title.contains("", ignoreCase = true) }
     HabitTrackerPreviewTheme {
         HabitScreen(
-            uiState = HabitsUiState(
+            uiState = HabitsUiState.Success(
                 habits = sample,
                 searchQuery = "",
                 listFilter = HabitListFilter.All,
@@ -220,7 +235,7 @@ private fun HabitScreenPreview() {
 private fun HabitScreenEmptyPreview() {
     HabitTrackerPreviewTheme {
         HabitScreen(
-            uiState = HabitsUiState(),
+            uiState = HabitsUiState.Loading,
             onSearchQueryChange = {},
             onListFilterChange = {},
             onSortAlphabeticallyChange = {},
