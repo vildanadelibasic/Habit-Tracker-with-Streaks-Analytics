@@ -3,8 +3,9 @@ package com.example.mobileprogrammingarchitecture.presentation.viewmodel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mobileprogrammingarchitecture.data.model.HabitData
-import com.example.mobileprogrammingarchitecture.data.repository.HabitRepository
+import com.example.mobileprogrammingarchitecture.data.repository.habit.HabitRepository
+import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.HabitDetailsEffect
+import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.HabitDetailsUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,18 +20,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-sealed interface HabitDetailsUiState {
-    data object Init : HabitDetailsUiState
-    data object Loading : HabitDetailsUiState
-    data class Ready(val habit: HabitData, val isMutationInProgress: Boolean) : HabitDetailsUiState
-    data object NotFound : HabitDetailsUiState
-    data class Error(val message: String) : HabitDetailsUiState
-}
-
-sealed interface HabitDetailsEffect {
-    data object Deleted : HabitDetailsEffect
-}
 
 @HiltViewModel
 class HabitDetailsViewModel @Inject constructor(
@@ -57,11 +46,12 @@ class HabitDetailsViewModel @Inject constructor(
         ) { habits, habitOpt, pending ->
             val habit = habitOpt ?: habits.find { it.id == habitId }
             when {
-                habit != null -> HabitDetailsUiState.Ready(
+                habit != null -> HabitDetailsUiState.Success(
                     habit = habit,
                     isMutationInProgress = pending > 0
                 )
-                habits.isNotEmpty() && habits.none { it.id == habitId } -> HabitDetailsUiState.NotFound
+                habits.isNotEmpty() && habits.none { it.id == habitId } ->
+                    HabitDetailsUiState.Error(message = "", popBack = true)
                 else -> HabitDetailsUiState.Loading
             }
         }

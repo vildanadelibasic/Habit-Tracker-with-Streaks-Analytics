@@ -8,7 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import com.example.mobileprogrammingarchitecture.data.model.ThemePreference
-import com.example.mobileprogrammingarchitecture.data.repository.UserPreferencesRepository
+import com.example.mobileprogrammingarchitecture.data.repository.preferences.UserPreferencesRepository
 import com.example.mobileprogrammingarchitecture.presentation.navigation.HabitTrackerScaffold
 import com.example.mobileprogrammingarchitecture.presentation.navigation.Screen
 import com.example.mobileprogrammingarchitecture.presentation.theme.MobileProgrammingArchitectureTheme

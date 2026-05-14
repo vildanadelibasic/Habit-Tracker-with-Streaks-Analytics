@@ -2,7 +2,8 @@ package com.example.mobileprogrammingarchitecture.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mobileprogrammingarchitecture.data.repository.HabitRepository
+import com.example.mobileprogrammingarchitecture.data.repository.habit.HabitRepository
+import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.ProfileUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,13 +12,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
-
-sealed interface ProfileUiState {
-    data object Init : ProfileUiState
-    data object Loading : ProfileUiState
-    data class Success(val totalHabits: Int, val completedHabits: Int) : ProfileUiState
-    data class Error(val message: String) : ProfileUiState
-}
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(

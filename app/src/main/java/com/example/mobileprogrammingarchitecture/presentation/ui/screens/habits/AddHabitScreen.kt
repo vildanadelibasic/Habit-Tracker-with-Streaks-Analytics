@@ -28,7 +28,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mobileprogrammingarchitecture.R
 import com.example.mobileprogrammingarchitecture.data.model.HabitDifficulty
 import com.example.mobileprogrammingarchitecture.presentation.theme.HabitTrackerPreviewTheme
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.AddHabitUiState
+import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.AddHabitUiState
 import com.example.mobileprogrammingarchitecture.presentation.viewmodel.AddHabitViewModel
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.CircularProgressIndicator
@@ -47,7 +47,7 @@ fun AddHabitScreen(
         }
     }
     when (val s = uiState) {
-        is AddHabitUiState.Ready ->
+        is AddHabitUiState.Success ->
             AddHabitScreenContent(
                 title = s.title,
                 onTitleChange = viewModel::setTitle,

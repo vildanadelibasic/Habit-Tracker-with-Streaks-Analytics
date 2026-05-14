@@ -125,6 +125,9 @@
         <item>Material 3</item>
     </string-array>
 
+    <string name="habit_not_found">Habit not found.</string>
+    <string name="error_unknown">Something went wrong.</string>
+
     <string name="login_title">Welcome back</string>
     <string name="login_subtitle">Sign in to continue tracking your habits.</string>
     <string name="login_email_label">Email</string>

@@ -12,14 +12,11 @@ import com.example.mobileprogrammingarchitecture.data.model.local.entity.AppSett
 import com.example.mobileprogrammingarchitecture.data.model.local.entity.CategoryEntity
 import com.example.mobileprogrammingarchitecture.data.model.local.entity.HabitCategoryCrossRef
 import com.example.mobileprogrammingarchitecture.data.model.local.entity.HabitCompletionLogEntity
-import com.example.mobileprogrammingarchitecture.data.repository.mappers.HabitEntityMapper
+import com.example.mobileprogrammingarchitecture.data.repository.habit.HabitEntityMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class DatabaseSeeder @Inject constructor(
+class DatabaseSeeder(
     private val database: HabitTrackerDatabase,
     private val habitDao: HabitDao,
     private val categoryDao: CategoryDao,

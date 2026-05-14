@@ -32,7 +32,7 @@ import com.example.mobileprogrammingarchitecture.presentation.ui.components.habi
 import com.example.mobileprogrammingarchitecture.presentation.ui.components.habits.HabitRowItem
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitListFilter
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitsEmptyContent
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.HabitsUiState
+import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.HabitsUiState
 
 @Composable
 fun HabitScreen(

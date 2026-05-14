@@ -3,8 +3,9 @@ package com.example.mobileprogrammingarchitecture.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mobileprogrammingarchitecture.data.model.HabitData
-import com.example.mobileprogrammingarchitecture.data.repository.HabitRepository
+import com.example.mobileprogrammingarchitecture.data.repository.habit.HabitRepository
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitListFilter
+import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.HabitsUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,22 +22,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Locale
 import javax.inject.Inject
-
-sealed interface HabitsUiState {
-    data object Init : HabitsUiState
-    data object Loading : HabitsUiState
-    data class Success(
-        val habits: List<HabitData>,
-        val searchQuery: String,
-        val listFilter: HabitListFilter,
-        val sortAlphabetically: Boolean,
-        val displayHabits: List<HabitData>,
-        val completedCount: Int,
-        val isWriteInProgress: Boolean
-    ) : HabitsUiState
-
-    data class Error(val message: String) : HabitsUiState
-}
 
 @HiltViewModel
 class HabitsViewModel @Inject constructor(

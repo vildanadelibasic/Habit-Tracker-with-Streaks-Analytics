@@ -3,7 +3,8 @@ package com.example.mobileprogrammingarchitecture.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mobileprogrammingarchitecture.data.model.ThemePreference
-import com.example.mobileprogrammingarchitecture.data.repository.UserPreferencesRepository
+import com.example.mobileprogrammingarchitecture.data.repository.preferences.UserPreferencesRepository
+import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.SettingsUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,13 +14,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-sealed interface SettingsUiState {
-    data object Init : SettingsUiState
-    data object Loading : SettingsUiState
-    data class Success(val themePreference: ThemePreference) : SettingsUiState
-    data class Error(val message: String) : SettingsUiState
-}
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(

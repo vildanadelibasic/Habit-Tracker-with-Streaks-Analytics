@@ -41,7 +41,7 @@ import com.example.mobileprogrammingarchitecture.presentation.ui.components.home
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.util.HomeProgressSection
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.util.HomeShortcut
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.util.ShortcutTarget
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.HomeUiState
+import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.HomeUiState
 
 @Composable
 fun HomeScreen(

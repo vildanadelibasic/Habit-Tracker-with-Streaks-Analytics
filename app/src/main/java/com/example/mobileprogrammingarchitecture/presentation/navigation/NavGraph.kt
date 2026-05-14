@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -25,19 +26,20 @@ import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.HomeScreen
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.profile.ProfileScreen
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.settings.SettingsScreen
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.AboutUiState
 import com.example.mobileprogrammingarchitecture.presentation.viewmodel.AboutViewModel
 import com.example.mobileprogrammingarchitecture.presentation.viewmodel.AddHabitViewModel
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.HabitDetailsEffect
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.HabitDetailsUiState
 import com.example.mobileprogrammingarchitecture.presentation.viewmodel.HabitDetailsViewModel
 import com.example.mobileprogrammingarchitecture.presentation.viewmodel.HabitsViewModel
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.HomeUiState
 import com.example.mobileprogrammingarchitecture.presentation.viewmodel.HomeViewModel
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.ProfileUiState
 import com.example.mobileprogrammingarchitecture.presentation.viewmodel.ProfileViewModel
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.SettingsUiState
 import com.example.mobileprogrammingarchitecture.presentation.viewmodel.SettingsViewModel
+import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.AboutUiState
+import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.HabitDetailsEffect
+import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.HabitDetailsUiState
+import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.HomeUiState
+import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.ProfileUiState
+import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.SettingsUiState
+import com.example.mobileprogrammingarchitecture.R
 import kotlinx.coroutines.launch
 
 @Composable
@@ -122,7 +124,8 @@ fun NavGraph(
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             LaunchedEffect(uiState) {
-                if (uiState is HabitDetailsUiState.NotFound) {
+                val s = uiState
+                if (s is HabitDetailsUiState.Error && s.popBack) {
                     navController.popBackStack()
                 }
             }
@@ -139,7 +142,7 @@ fun NavGraph(
             }
 
             when (val s = uiState) {
-                is HabitDetailsUiState.Ready ->
+                is HabitDetailsUiState.Success ->
                     HabitDetailsScreen(
                         habit = s.habit,
                         isMutationInProgress = s.isMutationInProgress,
@@ -148,11 +151,16 @@ fun NavGraph(
                     )
                 is HabitDetailsUiState.Error ->
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(s.message)
+                        Text(
+                            if (s.popBack && s.message.isEmpty()) {
+                                stringResource(R.string.habit_not_found)
+                            } else {
+                                s.message.ifEmpty { stringResource(R.string.error_unknown) }
+                            }
+                        )
                     }
                 HabitDetailsUiState.Init,
-                HabitDetailsUiState.Loading,
-                HabitDetailsUiState.NotFound ->
+                HabitDetailsUiState.Loading ->
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
                     }

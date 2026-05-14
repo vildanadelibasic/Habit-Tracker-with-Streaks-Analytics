@@ -4,7 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mobileprogrammingarchitecture.data.model.HabitData
 import com.example.mobileprogrammingarchitecture.data.model.HabitDifficulty
-import com.example.mobileprogrammingarchitecture.data.repository.HabitRepository
+import com.example.mobileprogrammingarchitecture.data.repository.habit.HabitRepository
+import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.AddHabitUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,23 +20,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-sealed interface AddHabitUiState {
-    data object Init : AddHabitUiState
-    data object Loading : AddHabitUiState
-    data class Ready(
-        val title: String,
-        val description: String,
-        val difficulty: HabitDifficulty,
-        val isDaily: Boolean,
-        val nextId: Int,
-        val isSaving: Boolean
-    ) : AddHabitUiState {
-        val isFormValid: Boolean get() = title.isNotBlank()
-    }
-
-    data class Error(val message: String) : AddHabitUiState
-}
 
 @HiltViewModel
 class AddHabitViewModel @Inject constructor(
@@ -77,7 +61,7 @@ class AddHabitViewModel @Inject constructor(
             isSaving
         ) { draft, habits, saving ->
             val nextId = (habits.maxOfOrNull { it.id } ?: 0) + 1
-            AddHabitUiState.Ready(
+            AddHabitUiState.Success(
                 title = draft.title,
                 description = draft.description,
                 difficulty = draft.difficulty,
@@ -109,7 +93,7 @@ class AddHabitViewModel @Inject constructor(
 
     fun saveHabit() {
         val s = uiState.value
-        if (s !is AddHabitUiState.Ready || !s.isFormValid || s.isSaving) return
+        if (s !is AddHabitUiState.Success || !s.isFormValid || s.isSaving) return
         val habit = HabitData(
             id = s.nextId,
             title = s.title.trim(),
