@@ -12,7 +12,7 @@ import com.example.mobileprogrammingarchitecture.data.model.local.entity.AppSett
 import com.example.mobileprogrammingarchitecture.data.model.local.entity.CategoryEntity
 import com.example.mobileprogrammingarchitecture.data.model.local.entity.HabitCategoryCrossRef
 import com.example.mobileprogrammingarchitecture.data.model.local.entity.HabitCompletionLogEntity
-import com.example.mobileprogrammingarchitecture.data.repository.habit.HabitEntityMapper
+import com.example.mobileprogrammingarchitecture.data.repository.mappers.HabitEntityMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

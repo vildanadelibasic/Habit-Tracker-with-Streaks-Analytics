@@ -10,9 +10,9 @@ import com.example.mobileprogrammingarchitecture.data.model.local.dao.HabitCateg
 import com.example.mobileprogrammingarchitecture.data.model.local.dao.HabitDao
 import com.example.mobileprogrammingarchitecture.data.model.local.db.HabitTrackerDatabase
 import com.example.mobileprogrammingarchitecture.data.repository.habit.HabitRepository
-import com.example.mobileprogrammingarchitecture.data.repository.habit.HabitRepositoryImpl
+import com.example.mobileprogrammingarchitecture.data.repository.habit.impl.HabitRepositoryImpl
 import com.example.mobileprogrammingarchitecture.data.repository.preferences.UserPreferencesRepository
-import com.example.mobileprogrammingarchitecture.data.repository.preferences.UserPreferencesRepositoryImpl
+import com.example.mobileprogrammingarchitecture.data.repository.preferences.impl.UserPreferencesRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
