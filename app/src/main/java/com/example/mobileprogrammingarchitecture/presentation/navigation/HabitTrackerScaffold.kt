@@ -20,17 +20,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.mobileprogrammingarchitecture.R
 import com.example.mobileprogrammingarchitecture.presentation.navigation.bottom_bar.BottomBarNavigationComponent
 import com.example.mobileprogrammingarchitecture.presentation.navigation.bottom_bar.BottomBarNavigationItems
-import com.example.mobileprogrammingarchitecture.presentation.theme.ThemePreference
-import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HabitTrackerScaffold(
     navController: NavHostController,
-    habits: List<HabitData>,
-    onHabitsChange: (List<HabitData>) -> Unit,
-    themePreference: ThemePreference,
-    onThemePreferenceChange: (ThemePreference) -> Unit,
     startDestination: String = Screen.Home.route
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -77,13 +71,9 @@ fun HabitTrackerScaffold(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            habits = habits,
-            onHabitsChange = onHabitsChange,
             snackbarHostState = snackbarHostState,
             snackbarAddedMessage = snackbarAddedMessage,
-            snackbarDeletedMessage = snackbarDeletedMessage,
-            themePreference = themePreference,
-            onThemePreferenceChange = onThemePreferenceChange
+            snackbarDeletedMessage = snackbarDeletedMessage
         )
     }
 }

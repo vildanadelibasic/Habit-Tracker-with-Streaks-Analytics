@@ -5,31 +5,32 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
+import com.example.mobileprogrammingarchitecture.data.model.ThemePreference
+import com.example.mobileprogrammingarchitecture.data.repository.preferences.UserPreferencesRepository
 import com.example.mobileprogrammingarchitecture.presentation.navigation.HabitTrackerScaffold
 import com.example.mobileprogrammingarchitecture.presentation.navigation.Screen
 import com.example.mobileprogrammingarchitecture.presentation.theme.MobileProgrammingArchitectureTheme
-import com.example.mobileprogrammingarchitecture.presentation.theme.ThemePreference
-import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitSampleDefaults
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var userPreferencesRepository: UserPreferencesRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            var themePreference by remember { mutableStateOf(ThemePreference.System) }
+            val themePreference by userPreferencesRepository.observeThemePreference()
+                .collectAsStateWithLifecycle(initialValue = ThemePreference.System)
             MobileProgrammingArchitectureTheme(themePreference = themePreference) {
                 val navController = rememberNavController()
-                var habits by remember { mutableStateOf(HabitSampleDefaults.initial) }
                 HabitTrackerScaffold(
                     navController = navController,
-                    habits = habits,
-                    onHabitsChange = { habits = it },
-                    themePreference = themePreference,
-                    onThemePreferenceChange = { themePreference = it },
                     startDestination = Screen.Home.route
                 )
             }

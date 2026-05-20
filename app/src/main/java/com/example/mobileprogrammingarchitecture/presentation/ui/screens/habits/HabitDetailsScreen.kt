@@ -23,13 +23,14 @@ import androidx.compose.ui.unit.dp
 import com.example.mobileprogrammingarchitecture.R
 import com.example.mobileprogrammingarchitecture.presentation.theme.HabitTrackerPreviewTheme
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.DetailLabelValueRow
-import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitData
-import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitDifficulty
-import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitSampleDefaults
+import com.example.mobileprogrammingarchitecture.data.model.HabitData
+import com.example.mobileprogrammingarchitecture.data.model.HabitDifficulty
+import com.example.mobileprogrammingarchitecture.data.model.HabitSampleDefaults
 
 @Composable
 fun HabitDetailsScreen(
     habit: HabitData,
+    isMutationInProgress: Boolean = false,
     onToggleCompleted: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
@@ -58,6 +59,7 @@ fun HabitDetailsScreen(
         typeValue = typeLabel,
         isCompleted = habit.isCompleted,
         completionLabel = completionLabel,
+        interactionsEnabled = !isMutationInProgress,
         onToggleCompleted = onToggleCompleted,
         onDelete = onDelete,
         modifier = modifier
@@ -72,6 +74,7 @@ private fun HabitDetailsScreenContent(
     typeValue: String,
     isCompleted: Boolean,
     completionLabel: String,
+    interactionsEnabled: Boolean,
     onToggleCompleted: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
@@ -94,7 +97,7 @@ private fun HabitDetailsScreenContent(
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.weight(1f)
                 )
-                IconButton(onClick = onDelete) {
+                IconButton(onClick = onDelete, enabled = interactionsEnabled) {
                     Icon(
                         imageVector = Icons.Outlined.Delete,
                         contentDescription = stringResource(R.string.cd_delete_habit),
@@ -123,7 +126,15 @@ private fun HabitDetailsScreenContent(
         }
         item {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(checked = isCompleted, onCheckedChange = { onToggleCompleted() })
+                Checkbox(
+                    checked = isCompleted,
+                    onCheckedChange = if (interactionsEnabled) {
+                        { onToggleCompleted() }
+                    } else {
+                        null
+                    },
+                    enabled = interactionsEnabled
+                )
                 Text(
                     text = completionLabel,
                     style = MaterialTheme.typography.bodyLarge,

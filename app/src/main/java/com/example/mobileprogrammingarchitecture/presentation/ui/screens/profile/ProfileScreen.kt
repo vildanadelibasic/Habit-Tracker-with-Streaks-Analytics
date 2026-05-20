@@ -24,6 +24,8 @@ import com.example.mobileprogrammingarchitecture.presentation.ui.screens.profile
 
 @Composable
 fun ProfileScreen(
+    completedHabitsCount: Int,
+    totalHabitsCount: Int,
     onOpenAbout: () -> Unit,
     onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier
@@ -31,7 +33,11 @@ fun ProfileScreen(
     val studentTitle = stringResource(R.string.profile_row_student_title)
     val studentSubtitle = stringResource(R.string.profile_row_student_subtitle)
     val versionTitle = stringResource(R.string.profile_row_version_title)
-    val versionSubtitle = stringResource(R.string.profile_row_version_subtitle)
+    val versionSubtitle = stringResource(
+        R.string.profile_row_version_subtitle_stats,
+        completedHabitsCount,
+        totalHabitsCount
+    )
     val themeTitle = stringResource(R.string.profile_row_theme_title)
     val themeSubtitle = stringResource(R.string.profile_row_theme_subtitle)
     val aboutNavTitle = stringResource(R.string.profile_nav_about_title)
@@ -105,6 +111,8 @@ private fun ProfileScreenContent(
 private fun ProfileScreenPreview() {
     HabitTrackerPreviewTheme {
         ProfileScreen(
+            completedHabitsCount = 2,
+            totalHabitsCount = 7,
             onOpenAbout = {},
             onOpenSettings = {}
         )
@@ -116,6 +124,8 @@ private fun ProfileScreenPreview() {
 private fun ProfileScreenDarkPreview() {
     HabitTrackerPreviewTheme(darkTheme = true) {
         ProfileScreen(
+            completedHabitsCount = 0,
+            totalHabitsCount = 0,
             onOpenAbout = {},
             onOpenSettings = {}
         )

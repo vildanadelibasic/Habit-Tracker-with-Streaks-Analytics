@@ -25,12 +25,16 @@ import com.example.mobileprogrammingarchitecture.presentation.theme.HabitTracker
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutScreen(
+    habitsInRepository: Int,
+    completionLogCount: Int,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val body = stringResource(R.string.about_body)
     AboutScreenContent(
         bodyText = body,
+        repositoryHint = stringResource(R.string.about_repository_hint, habitsInRepository),
+        completionHint = stringResource(R.string.about_completion_logs_hint, completionLogCount),
         onBack = onBack,
         modifier = modifier
     )
@@ -40,6 +44,8 @@ fun AboutScreen(
 @Composable
 private fun AboutScreenContent(
     bodyText: String,
+    repositoryHint: String,
+    completionHint: String,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -73,6 +79,18 @@ private fun AboutScreenContent(
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onBackground
             )
+            Text(
+                text = repositoryHint,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 16.dp)
+            )
+            Text(
+                text = completionHint,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 8.dp)
+            )
         }
     }
 }
@@ -81,6 +99,6 @@ private fun AboutScreenContent(
 @Composable
 private fun AboutScreenPreview() {
     HabitTrackerPreviewTheme {
-        AboutScreen(onBack = {})
+        AboutScreen(habitsInRepository = 7, completionLogCount = 2, onBack = {})
     }
 }

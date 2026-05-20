@@ -1,7 +1,6 @@
 package com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,52 +16,63 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mobileprogrammingarchitecture.R
+import com.example.mobileprogrammingarchitecture.data.model.HabitDifficulty
 import com.example.mobileprogrammingarchitecture.presentation.theme.HabitTrackerPreviewTheme
-import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitData
-import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitDifficulty
+import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.AddHabitUiState
+import com.example.mobileprogrammingarchitecture.presentation.viewmodel.AddHabitViewModel
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.CircularProgressIndicator
 
 @Composable
 fun AddHabitScreen(
-    nextId: Int,
-    onSave: (HabitData) -> Unit,
+    viewModel: AddHabitViewModel,
+    onSaveSuccess: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var title by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var difficulty by remember { mutableStateOf(HabitDifficulty.Medium) }
-    var isDaily by remember { mutableStateOf(true) }
-
-    val isFormValid = remember(title) {
-        title.isNotBlank()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    LaunchedEffect(viewModel) {
+        viewModel.saveCompleted.collect {
+            onSaveSuccess()
+        }
     }
-
-    AddHabitScreenContent(
-        title = title,
-        onTitleChange = { title = it },
-        description = description,
-        onDescriptionChange = { description = it },
-        difficulty = difficulty,
-        onDifficultyChange = { difficulty = it },
-        isDaily = isDaily,
-        onIsDailyChange = { isDaily = it },
-        isFormValid = isFormValid,
-        nextId = nextId,
-        onSave = onSave,
-        onCancel = onCancel,
-        modifier = modifier
-    )
+    when (val s = uiState) {
+        is AddHabitUiState.Success ->
+            AddHabitScreenContent(
+                title = s.title,
+                onTitleChange = viewModel::setTitle,
+                description = s.description,
+                onDescriptionChange = viewModel::setDescription,
+                difficulty = s.difficulty,
+                onDifficultyChange = viewModel::setDifficulty,
+                isDaily = s.isDaily,
+                onIsDailyChange = viewModel::setIsDaily,
+                isFormValid = s.isFormValid,
+                isSaving = s.isSaving,
+                onSaveClick = { viewModel.saveHabit() },
+                onCancel = onCancel,
+                modifier = modifier
+            )
+        AddHabitUiState.Init,
+        AddHabitUiState.Loading ->
+            Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        is AddHabitUiState.Error ->
+            Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(s.message)
+            }
+    }
 }
 
 @Composable
@@ -76,8 +86,8 @@ private fun AddHabitScreenContent(
     isDaily: Boolean,
     onIsDailyChange: (Boolean) -> Unit,
     isFormValid: Boolean,
-    nextId: Int,
-    onSave: (HabitData) -> Unit,
+    isSaving: Boolean,
+    onSaveClick: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -162,22 +172,17 @@ private fun AddHabitScreenContent(
         }
         item {
             Button(
-                onClick = {
-                    onSave(
-                        HabitData(
-                            id = nextId,
-                            title = title.trim(),
-                            description = description.trim(),
-                            isCompleted = false,
-                            difficulty = difficulty,
-                            isDaily = isDaily
-                        )
-                    )
-                },
-                enabled = isFormValid,
+                onClick = onSaveClick,
+                enabled = isFormValid && !isSaving,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(stringResource(R.string.action_save))
+                Text(
+                    if (isSaving) {
+                        stringResource(R.string.add_habit_saving)
+                    } else {
+                        stringResource(R.string.action_save)
+                    }
+                )
             }
         }
         item {
@@ -217,9 +222,18 @@ private fun DifficultyOptionRow(
 @Composable
 private fun AddHabitScreenPreview() {
     HabitTrackerPreviewTheme {
-        AddHabitScreen(
-            nextId = 100,
-            onSave = {},
+        AddHabitScreenContent(
+            title = "",
+            onTitleChange = {},
+            description = "",
+            onDescriptionChange = {},
+            difficulty = HabitDifficulty.Medium,
+            onDifficultyChange = {},
+            isDaily = true,
+            onIsDailyChange = {},
+            isFormValid = false,
+            isSaving = false,
+            onSaveClick = {},
             onCancel = {}
         )
     }
