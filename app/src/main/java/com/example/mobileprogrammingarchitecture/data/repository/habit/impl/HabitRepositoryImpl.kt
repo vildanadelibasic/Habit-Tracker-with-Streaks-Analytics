@@ -54,6 +54,28 @@ class HabitRepositoryImpl(
         }
     }
 
+    override suspend fun importRemoteHabits(habits: List<HabitData>) {
+        withContext(Dispatchers.IO) {
+            database.withTransaction {
+                habits.forEach { remote ->
+                    val existing = habitDao.observeHabitWithCategories(remote.id).first()
+                    if (existing == null) {
+                        habitDao.insertHabit(
+                            HabitEntityMapper.toEntity(remote, System.currentTimeMillis())
+                        )
+                        habitCategoryCrossRefDao.insert(
+                            HabitCategoryCrossRef(habitId = remote.id, categoryId = DEFAULT_CATEGORY_ID)
+                        )
+                    } else {
+                        habitDao.updateHabit(
+                            HabitEntityMapper.toEntity(remote, existing.habit.createdAtMillis)
+                        )
+                    }
+                }
+            }
+        }
+    }
+
     override suspend fun insertHabit(habit: HabitData) {
         withContext(Dispatchers.IO) {
             val id = habitDao.getMaxHabitId() + 1

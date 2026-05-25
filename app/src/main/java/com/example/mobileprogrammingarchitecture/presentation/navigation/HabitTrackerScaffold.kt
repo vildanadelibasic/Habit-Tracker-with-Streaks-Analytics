@@ -25,7 +25,8 @@ import com.example.mobileprogrammingarchitecture.presentation.navigation.bottom_
 @Composable
 fun HabitTrackerScaffold(
     navController: NavHostController,
-    startDestination: String = Screen.Home.route
+    startDestination: String = Screen.Home.route,
+    onLogout: () -> Unit = {}
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -73,7 +74,8 @@ fun HabitTrackerScaffold(
                 .padding(innerPadding),
             snackbarHostState = snackbarHostState,
             snackbarAddedMessage = snackbarAddedMessage,
-            snackbarDeletedMessage = snackbarDeletedMessage
+            snackbarDeletedMessage = snackbarDeletedMessage,
+            onLogout = onLogout
         )
     }
 }

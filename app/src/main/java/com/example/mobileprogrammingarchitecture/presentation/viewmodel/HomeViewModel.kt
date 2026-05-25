@@ -3,6 +3,7 @@ package com.example.mobileprogrammingarchitecture.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mobileprogrammingarchitecture.data.repository.habit.HabitRepository
+import com.example.mobileprogrammingarchitecture.data.repository.habit.HabitRemoteRepository
 import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,13 +18,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val habitRepository: HabitRepository
+    private val habitRepository: HabitRepository,
+    private val habitRemoteRepository: HabitRemoteRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Init)
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     private val isRefreshing = MutableStateFlow(false)
+    private val networkMessage = MutableStateFlow<String?>(null)
 
     init {
         _uiState.value = HomeUiState.Loading
@@ -31,7 +34,12 @@ class HomeViewModel @Inject constructor(
             .catch { e -> _uiState.value = HomeUiState.Error(e.message ?: "Unknown error") }
             .onEach { habits ->
                 val refreshing = isRefreshing.value
-                _uiState.value = HomeUiState.Success(habits = habits, isRefreshing = refreshing)
+                val message = networkMessage.value
+                _uiState.value = HomeUiState.Success(
+                    habits = habits,
+                    isRefreshing = refreshing,
+                    networkMessage = message
+                )
             }
             .launchIn(viewModelScope)
         isRefreshing
@@ -42,6 +50,14 @@ class HomeViewModel @Inject constructor(
                 }
             }
             .launchIn(viewModelScope)
+        networkMessage
+            .onEach { message ->
+                val cur = _uiState.value
+                if (cur is HomeUiState.Success) {
+                    _uiState.value = cur.copy(networkMessage = message)
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     fun refreshHabits() {
@@ -49,7 +65,15 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             isRefreshing.update { true }
             try {
-                habitRepository.syncHabits()
+                val remoteHabits = habitRemoteRepository.getHabits()
+                habitRepository.importRemoteHabits(remoteHabits)
+                networkMessage.update {
+                    "Synced ${remoteHabits.size} habits from REST API"
+                }
+            } catch (e: Exception) {
+                networkMessage.update {
+                    e.message ?: "Network sync failed"
+                }
             } finally {
                 isRefreshing.update { false }
             }

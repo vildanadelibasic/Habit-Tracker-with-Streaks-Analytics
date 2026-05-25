@@ -2,7 +2,8 @@ package com.example.mobileprogrammingarchitecture.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mobileprogrammingarchitecture.data.model.HabitData
+import com.example.mobileprogrammingarchitecture.data.repository.auth.AuthRepository
+import com.example.mobileprogrammingarchitecture.data.repository.cloud.HabitCloudRepository
 import com.example.mobileprogrammingarchitecture.data.repository.habit.HabitRepository
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitListFilter
 import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.HabitsUiState
@@ -25,7 +26,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HabitsViewModel @Inject constructor(
-    private val habitRepository: HabitRepository
+    private val habitRepository: HabitRepository,
+    private val habitCloudRepository: HabitCloudRepository,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val searchQuery = MutableStateFlow("")
@@ -47,6 +50,10 @@ class HabitsViewModel @Inject constructor(
         SearchInputs("", "")
     )
 
+    private val cloudHabits = habitCloudRepository.observeCloudHabits()
+        .catch { emit(emptyList()) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
     private val _uiState = MutableStateFlow<HabitsUiState>(HabitsUiState.Init)
     val uiState: StateFlow<HabitsUiState> = _uiState.asStateFlow()
 
@@ -57,8 +64,10 @@ class HabitsViewModel @Inject constructor(
             searchInputs,
             listFilter,
             sortAlphabetically,
-            pendingWrites
-        ) { habits, search, filter, sortAz, pending ->
+            pendingWrites,
+            cloudHabits,
+            authRepository.observeIsLoggedIn()
+        ) { habits, search, filter, sortAz, pending, cloud, isLoggedIn ->
             val filtered = habits
                 .filter { it.title.contains(search.debounced, ignoreCase = true) }
                 .filter {
@@ -80,7 +89,8 @@ class HabitsViewModel @Inject constructor(
                 sortAlphabetically = sortAz,
                 displayHabits = display,
                 completedCount = habits.count { it.isCompleted },
-                isWriteInProgress = pending > 0
+                isWriteInProgress = pending > 0,
+                cloudHabitsCount = if (isLoggedIn) cloud.size else 0
             )
         }
             .catch { _uiState.value = HabitsUiState.Error(it.message ?: "Unknown error") }
@@ -107,6 +117,9 @@ class HabitsViewModel @Inject constructor(
                 val row = habitRepository.observeHabit(habitId).first()
                 if (row != null) {
                     habitRepository.setHabitCompleted(habitId, !row.isCompleted)
+                    if (authRepository.currentUserEmail() != null) {
+                        habitCloudRepository.upsertHabit(row.copy(isCompleted = !row.isCompleted))
+                    }
                 }
             } finally {
                 pendingWrites.update { (it - 1).coerceAtLeast(0) }

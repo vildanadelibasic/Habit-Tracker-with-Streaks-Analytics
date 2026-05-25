@@ -49,7 +49,8 @@ fun NavGraph(
     modifier: Modifier,
     snackbarHostState: SnackbarHostState,
     snackbarAddedMessage: String,
-    snackbarDeletedMessage: String
+    snackbarDeletedMessage: String,
+    onLogout: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
@@ -174,6 +175,8 @@ fun NavGraph(
                     ProfileScreen(
                         completedHabitsCount = s.completedHabits,
                         totalHabitsCount = s.totalHabits,
+                        userEmail = s.userEmail,
+                        onLogout = onLogout,
                         onOpenAbout = {
                             navController.navigate(Screen.About.route) {
                                 launchSingleTop = true

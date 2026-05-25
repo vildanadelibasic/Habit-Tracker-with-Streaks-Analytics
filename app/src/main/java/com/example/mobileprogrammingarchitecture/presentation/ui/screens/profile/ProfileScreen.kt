@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -26,6 +27,8 @@ import com.example.mobileprogrammingarchitecture.presentation.ui.screens.profile
 fun ProfileScreen(
     completedHabitsCount: Int,
     totalHabitsCount: Int,
+    userEmail: String?,
+    onLogout: () -> Unit,
     onOpenAbout: () -> Unit,
     onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier
@@ -58,6 +61,8 @@ fun ProfileScreen(
     ProfileScreenContent(
         rows = rows,
         tags = tags,
+        userEmail = userEmail,
+        onLogout = onLogout,
         modifier = modifier
     )
 }
@@ -66,6 +71,8 @@ fun ProfileScreen(
 private fun ProfileScreenContent(
     rows: List<ProfileRowData>,
     tags: Array<String>,
+    userEmail: String?,
+    onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -76,8 +83,22 @@ private fun ProfileScreenContent(
         Text(
             text = stringResource(R.string.profile_title),
             style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(top = 16.dp, bottom = 12.dp)
+            modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
         )
+        userEmail?.let { email ->
+            Text(
+                text = stringResource(R.string.profile_signed_in_as, email),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+        }
+        OutlinedButton(
+            onClick = onLogout,
+            modifier = Modifier.padding(bottom = 12.dp)
+        ) {
+            Text(stringResource(R.string.action_logout))
+        }
         Text(
             text = stringResource(R.string.profile_tags),
             style = MaterialTheme.typography.titleSmall,
@@ -113,6 +134,8 @@ private fun ProfileScreenPreview() {
         ProfileScreen(
             completedHabitsCount = 2,
             totalHabitsCount = 7,
+            userEmail = "student@example.com",
+            onLogout = {},
             onOpenAbout = {},
             onOpenSettings = {}
         )
@@ -126,6 +149,8 @@ private fun ProfileScreenDarkPreview() {
         ProfileScreen(
             completedHabitsCount = 0,
             totalHabitsCount = 0,
+            userEmail = null,
+            onLogout = {},
             onOpenAbout = {},
             onOpenSettings = {}
         )

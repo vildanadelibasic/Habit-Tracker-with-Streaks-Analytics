@@ -2,6 +2,7 @@ package com.example.mobileprogrammingarchitecture.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.mobileprogrammingarchitecture.data.repository.auth.AuthRepository
 import com.example.mobileprogrammingarchitecture.data.repository.habit.HabitRepository
 import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.ProfileUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -9,13 +10,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    habitRepository: HabitRepository
+    habitRepository: HabitRepository,
+    authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<ProfileUiState>(ProfileUiState.Init)
@@ -23,14 +26,18 @@ class ProfileViewModel @Inject constructor(
 
     init {
         _uiState.value = ProfileUiState.Loading
-        habitRepository.observeHabits()
+        combine(
+            habitRepository.observeHabits(),
+            authRepository.observeIsLoggedIn()
+        ) { habits, _ ->
+            ProfileUiState.Success(
+                totalHabits = habits.size,
+                completedHabits = habits.count { it.isCompleted },
+                userEmail = authRepository.currentUserEmail()
+            )
+        }
             .catch { _uiState.value = ProfileUiState.Error(it.message ?: "Unknown error") }
-            .onEach { habits ->
-                _uiState.value = ProfileUiState.Success(
-                    totalHabits = habits.size,
-                    completedHabits = habits.count { it.isCompleted }
-                )
-            }
+            .onEach { _uiState.value = it }
             .launchIn(viewModelScope)
     }
 }

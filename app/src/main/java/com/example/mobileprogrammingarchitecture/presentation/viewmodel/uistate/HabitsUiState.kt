@@ -13,7 +13,8 @@ sealed interface HabitsUiState {
         val sortAlphabetically: Boolean,
         val displayHabits: List<HabitData>,
         val completedCount: Int,
-        val isWriteInProgress: Boolean
+        val isWriteInProgress: Boolean,
+        val cloudHabitsCount: Int = 0
     ) : HabitsUiState
 
     data class Error(val message: String) : HabitsUiState

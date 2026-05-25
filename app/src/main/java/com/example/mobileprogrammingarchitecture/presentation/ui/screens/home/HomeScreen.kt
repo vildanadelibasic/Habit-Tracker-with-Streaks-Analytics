@@ -83,6 +83,7 @@ fun HomeScreen(
 
             HomeScreenContent(
                 isRefreshing = s.isRefreshing,
+                networkMessage = s.networkMessage,
                 onRefresh = onRefresh,
                 completedCount = completedCount,
                 totalHabitCount = habits.size,
@@ -117,6 +118,7 @@ fun HomeScreen(
 @Composable
 private fun HomeScreenContent(
     isRefreshing: Boolean,
+    networkMessage: String?,
     onRefresh: () -> Unit,
     completedCount: Int,
     totalHabitCount: Int,
@@ -169,6 +171,15 @@ private fun HomeScreenContent(
                     )
                 }
             }
+        }
+
+        networkMessage?.let { message ->
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(top = 8.dp)
+            )
         }
 
         Spacer(modifier = Modifier.height(20.dp))

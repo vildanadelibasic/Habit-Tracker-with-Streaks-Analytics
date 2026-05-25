@@ -15,6 +15,8 @@ interface HabitRepository {
 
     suspend fun syncHabits()
 
+    suspend fun importRemoteHabits(habits: List<HabitData>)
+
     suspend fun insertHabit(habit: HabitData)
 
     suspend fun updateHabit(habit: HabitData)

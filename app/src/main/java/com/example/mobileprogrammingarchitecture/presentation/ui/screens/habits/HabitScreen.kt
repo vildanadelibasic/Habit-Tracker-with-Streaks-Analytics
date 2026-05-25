@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -49,6 +50,7 @@ fun HabitScreen(
             HabitScreenContent(
                 habits = s.habits,
                 completedCount = s.completedCount,
+                cloudHabitsCount = s.cloudHabitsCount,
                 isWriteInProgress = s.isWriteInProgress,
                 searchQuery = s.searchQuery,
                 onSearchQueryChange = onSearchQueryChange,
@@ -77,6 +79,7 @@ fun HabitScreen(
 private fun HabitScreenContent(
     habits: List<HabitData>,
     completedCount: Int,
+    cloudHabitsCount: Int,
     isWriteInProgress: Boolean,
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
@@ -116,8 +119,18 @@ private fun HabitScreenContent(
             text = stringResource(R.string.habits_completed_summary, completedCount, habits.size),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = 12.dp)
+            modifier = Modifier.padding(bottom = 4.dp)
         )
+        if (cloudHabitsCount > 0) {
+            Text(
+                text = stringResource(R.string.habits_cloud_realtime_count, cloudHabitsCount),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+        } else {
+            Spacer(modifier = Modifier.padding(bottom = 8.dp))
+        }
 
         OutlinedTextField(
             value = searchQuery,

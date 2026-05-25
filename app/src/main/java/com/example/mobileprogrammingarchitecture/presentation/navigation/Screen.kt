@@ -3,6 +3,8 @@ package com.example.mobileprogrammingarchitecture.presentation.navigation
 import android.net.Uri
 
 sealed class Screen(val route: String) {
+    data object Login : Screen("login_screen")
+    data object Register : Screen("register_screen")
     data object Home : Screen("home_screen")
     data object Habit : Screen("habit_screen")
     data object AddHabit : Screen("add_habit_screen")
