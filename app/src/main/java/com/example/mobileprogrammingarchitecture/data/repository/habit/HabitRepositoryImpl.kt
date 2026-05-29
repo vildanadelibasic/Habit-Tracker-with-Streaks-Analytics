@@ -1,13 +1,15 @@
 package com.example.mobileprogrammingarchitecture.data.repository.habit
 
-import com.example.mobileprogrammingarchitecture.data.model.HabitData
-import com.example.mobileprogrammingarchitecture.data.model.local.dao.CompletionLogDao
-import com.example.mobileprogrammingarchitecture.data.model.local.dao.HabitCategoryCrossRefDao
-import com.example.mobileprogrammingarchitecture.data.model.local.dao.HabitDao
 import androidx.room.withTransaction
-import com.example.mobileprogrammingarchitecture.data.model.local.db.HabitTrackerDatabase
-import com.example.mobileprogrammingarchitecture.data.model.local.entity.HabitCategoryCrossRef
-import com.example.mobileprogrammingarchitecture.data.model.local.entity.HabitCompletionLogEntity
+import com.example.mobileprogrammingarchitecture.domain.data.HabitData
+import com.example.mobileprogrammingarchitecture.data.datasource.local.dao.CompletionLogDao
+import com.example.mobileprogrammingarchitecture.data.datasource.local.dao.HabitCategoryCrossRefDao
+import com.example.mobileprogrammingarchitecture.data.datasource.local.dao.HabitDao
+import com.example.mobileprogrammingarchitecture.data.datasource.local.db.HabitTrackerDatabase
+import com.example.mobileprogrammingarchitecture.data.datasource.local.entity.HabitCategoryCrossRef
+import com.example.mobileprogrammingarchitecture.data.datasource.local.entity.HabitCompletionLogEntity
+import com.example.mobileprogrammingarchitecture.domain.repository.HabitRepository
+import com.example.mobileprogrammingarchitecture.data.mapper.HabitEntityMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -49,6 +51,28 @@ class HabitRepositoryImpl(
     override suspend fun syncHabits() {
         withContext(Dispatchers.IO) {
             delay(SYNC_DELAY_MS)
+        }
+    }
+
+    override suspend fun importRemoteHabits(habits: List<HabitData>) {
+        withContext(Dispatchers.IO) {
+            database.withTransaction {
+                habits.forEach { remote ->
+                    val existing = habitDao.observeHabitWithCategories(remote.id).first()
+                    if (existing == null) {
+                        habitDao.insertHabit(
+                            HabitEntityMapper.toEntity(remote, System.currentTimeMillis())
+                        )
+                        habitCategoryCrossRefDao.insert(
+                            HabitCategoryCrossRef(habitId = remote.id, categoryId = DEFAULT_CATEGORY_ID)
+                        )
+                    } else {
+                        habitDao.updateHabit(
+                            HabitEntityMapper.toEntity(remote, existing.habit.createdAtMillis)
+                        )
+                    }
+                }
+            }
         }
     }
 

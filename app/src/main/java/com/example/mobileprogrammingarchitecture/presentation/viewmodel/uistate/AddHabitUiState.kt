@@ -1,6 +1,6 @@
 package com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate
 
-import com.example.mobileprogrammingarchitecture.data.model.HabitDifficulty
+import com.example.mobileprogrammingarchitecture.domain.data.HabitDifficulty
 
 sealed interface AddHabitUiState {
     data object Init : AddHabitUiState

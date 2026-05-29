@@ -26,7 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mobileprogrammingarchitecture.R
-import com.example.mobileprogrammingarchitecture.data.model.HabitDifficulty
+import com.example.mobileprogrammingarchitecture.domain.data.HabitDifficulty
 import com.example.mobileprogrammingarchitecture.presentation.theme.HabitTrackerPreviewTheme
 import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.AddHabitUiState
 import com.example.mobileprogrammingarchitecture.presentation.viewmodel.AddHabitViewModel

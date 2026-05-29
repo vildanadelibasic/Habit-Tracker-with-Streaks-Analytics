@@ -2,9 +2,9 @@ package com.example.mobileprogrammingarchitecture.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mobileprogrammingarchitecture.data.repository.auth.AuthRepository
-import com.example.mobileprogrammingarchitecture.data.repository.cloud.HabitCloudRepository
-import com.example.mobileprogrammingarchitecture.data.repository.habit.HabitRepository
+import com.example.mobileprogrammingarchitecture.domain.repository.AuthRepository
+import com.example.mobileprogrammingarchitecture.domain.repository.HabitCloudRepository
+import com.example.mobileprogrammingarchitecture.domain.repository.HabitRepository
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.util.HabitListFilter
 import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.HabitsUiState
 import dagger.hilt.android.lifecycle.HiltViewModel

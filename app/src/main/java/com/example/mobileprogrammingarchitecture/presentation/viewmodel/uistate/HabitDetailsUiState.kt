@@ -1,6 +1,6 @@
 package com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate
 
-import com.example.mobileprogrammingarchitecture.data.model.HabitData
+import com.example.mobileprogrammingarchitecture.domain.data.HabitData
 
 sealed interface HabitDetailsUiState {
     data object Init : HabitDetailsUiState

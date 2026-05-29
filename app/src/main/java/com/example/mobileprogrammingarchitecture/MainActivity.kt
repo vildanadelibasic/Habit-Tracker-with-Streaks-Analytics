@@ -7,9 +7,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
-import com.example.mobileprogrammingarchitecture.data.model.ThemePreference
-import com.example.mobileprogrammingarchitecture.data.repository.auth.AuthRepository
-import com.example.mobileprogrammingarchitecture.data.repository.preferences.UserPreferencesRepository
+import com.example.mobileprogrammingarchitecture.domain.data.ThemePreference
+import com.example.mobileprogrammingarchitecture.domain.repository.AuthRepository
+import com.example.mobileprogrammingarchitecture.domain.repository.UserPreferencesRepository
 import com.example.mobileprogrammingarchitecture.presentation.navigation.AuthLoadingGate
 import com.example.mobileprogrammingarchitecture.presentation.navigation.AuthNavGraph
 import com.example.mobileprogrammingarchitecture.presentation.navigation.HabitTrackerScaffold

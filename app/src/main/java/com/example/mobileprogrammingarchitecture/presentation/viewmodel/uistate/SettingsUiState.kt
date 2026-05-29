@@ -1,6 +1,6 @@
 package com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate
 
-import com.example.mobileprogrammingarchitecture.data.model.ThemePreference
+import com.example.mobileprogrammingarchitecture.domain.data.ThemePreference
 
 sealed interface SettingsUiState {
     data object Init : SettingsUiState

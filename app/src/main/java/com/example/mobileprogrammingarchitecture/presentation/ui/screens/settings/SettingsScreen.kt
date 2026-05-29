@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mobileprogrammingarchitecture.R
 import com.example.mobileprogrammingarchitecture.presentation.theme.HabitTrackerPreviewTheme
-import com.example.mobileprogrammingarchitecture.data.model.ThemePreference
+import com.example.mobileprogrammingarchitecture.domain.data.ThemePreference
 import com.example.mobileprogrammingarchitecture.presentation.ui.components.habits.HabitFilterChipItem
 
 @OptIn(ExperimentalMaterial3Api::class)

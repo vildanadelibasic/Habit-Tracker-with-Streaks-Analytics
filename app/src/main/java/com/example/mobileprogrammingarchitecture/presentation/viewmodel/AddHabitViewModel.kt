@@ -2,9 +2,9 @@ package com.example.mobileprogrammingarchitecture.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mobileprogrammingarchitecture.data.model.HabitData
-import com.example.mobileprogrammingarchitecture.data.model.HabitDifficulty
-import com.example.mobileprogrammingarchitecture.data.repository.habit.HabitRepository
+import com.example.mobileprogrammingarchitecture.domain.data.HabitData
+import com.example.mobileprogrammingarchitecture.domain.data.HabitDifficulty
+import com.example.mobileprogrammingarchitecture.domain.repository.HabitRepository
 import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.AddHabitUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow

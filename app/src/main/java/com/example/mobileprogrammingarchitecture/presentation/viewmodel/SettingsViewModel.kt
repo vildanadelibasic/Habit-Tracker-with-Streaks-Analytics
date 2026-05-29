@@ -2,8 +2,8 @@ package com.example.mobileprogrammingarchitecture.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mobileprogrammingarchitecture.data.model.ThemePreference
-import com.example.mobileprogrammingarchitecture.data.repository.preferences.UserPreferencesRepository
+import com.example.mobileprogrammingarchitecture.domain.data.ThemePreference
+import com.example.mobileprogrammingarchitecture.domain.repository.UserPreferencesRepository
 import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.SettingsUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

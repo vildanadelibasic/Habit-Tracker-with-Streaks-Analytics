@@ -1,8 +1,9 @@
 package com.example.mobileprogrammingarchitecture.data.repository.preferences
 
-import com.example.mobileprogrammingarchitecture.data.model.ThemePreference
-import com.example.mobileprogrammingarchitecture.data.model.local.dao.AppSettingsDao
-import com.example.mobileprogrammingarchitecture.data.model.local.entity.AppSettingEntity
+import com.example.mobileprogrammingarchitecture.domain.data.ThemePreference
+import com.example.mobileprogrammingarchitecture.data.datasource.local.dao.AppSettingsDao
+import com.example.mobileprogrammingarchitecture.data.datasource.local.entity.AppSettingEntity
+import com.example.mobileprogrammingarchitecture.domain.repository.UserPreferencesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow

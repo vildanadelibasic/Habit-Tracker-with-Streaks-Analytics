@@ -26,8 +26,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mobileprogrammingarchitecture.R
-import com.example.mobileprogrammingarchitecture.data.model.HabitData
-import com.example.mobileprogrammingarchitecture.data.model.HabitSampleDefaults
+import com.example.mobileprogrammingarchitecture.domain.data.HabitData
+import com.example.mobileprogrammingarchitecture.domain.data.HabitSampleDefaults
 import com.example.mobileprogrammingarchitecture.presentation.theme.HabitTrackerPreviewTheme
 import com.example.mobileprogrammingarchitecture.presentation.ui.components.habits.HabitFilterChipItem
 import com.example.mobileprogrammingarchitecture.presentation.ui.components.habits.HabitRowItem
