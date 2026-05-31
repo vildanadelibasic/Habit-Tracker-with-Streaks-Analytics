@@ -19,27 +19,33 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.mobileprogrammingarchitecture.R
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.about.AboutScreen
-import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.AddHabitScreen
-import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.HabitDetailsScreen
-import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habits.HabitScreen
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.auth.LoginScreen
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.auth.RegistrationScreen
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habit.AddHabitScreen
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habit.EditHabitScreen
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.habit.HabitsScreen
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.HomeScreen
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.profile.ProfileScreen
 import com.example.mobileprogrammingarchitecture.presentation.ui.screens.settings.SettingsScreen
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.AboutViewModel
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.AddHabitViewModel
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.HabitDetailsViewModel
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.HabitsViewModel
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.HomeViewModel
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.ProfileViewModel
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.SettingsViewModel
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.AboutUiState
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.HabitDetailsEffect
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.HabitDetailsUiState
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.HomeUiState
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.ProfileUiState
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.SettingsUiState
-import com.example.mobileprogrammingarchitecture.R
+import com.example.mobileprogrammingarchitecture.presentation.view_model.about.AboutUiState
+import com.example.mobileprogrammingarchitecture.presentation.view_model.about.AboutViewModel
+import com.example.mobileprogrammingarchitecture.presentation.view_model.auth.login.LoginUiState
+import com.example.mobileprogrammingarchitecture.presentation.view_model.auth.login.LoginViewModel
+import com.example.mobileprogrammingarchitecture.presentation.view_model.auth.registration.RegistrationUiState
+import com.example.mobileprogrammingarchitecture.presentation.view_model.auth.registration.RegistrationViewModel
+import com.example.mobileprogrammingarchitecture.presentation.view_model.habit.HabitUiState
+import com.example.mobileprogrammingarchitecture.presentation.view_model.habit.HabitViewModel
+import com.example.mobileprogrammingarchitecture.presentation.view_model.habit.add_habit.AddHabitViewModel
+import com.example.mobileprogrammingarchitecture.presentation.view_model.habit.edit_habit.EditHabitNavigationEvent
+import com.example.mobileprogrammingarchitecture.presentation.view_model.habit.edit_habit.EditHabitUiState
+import com.example.mobileprogrammingarchitecture.presentation.view_model.habit.edit_habit.EditHabitViewModel
+import com.example.mobileprogrammingarchitecture.presentation.view_model.home.HomeViewModel
+import com.example.mobileprogrammingarchitecture.presentation.view_model.profile.ProfileUiState
+import com.example.mobileprogrammingarchitecture.presentation.view_model.profile.ProfileViewModel
+import com.example.mobileprogrammingarchitecture.presentation.view_model.settings.SettingsUiState
+import com.example.mobileprogrammingarchitecture.presentation.view_model.settings.SettingsViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -49,7 +55,8 @@ fun NavGraph(
     modifier: Modifier,
     snackbarHostState: SnackbarHostState,
     snackbarAddedMessage: String,
-    snackbarDeletedMessage: String
+    snackbarDeletedMessage: String,
+    onLogout: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
@@ -58,6 +65,50 @@ fun NavGraph(
         startDestination = startDestination,
         modifier = modifier
     ) {
+        composable(Screen.Register.route) {
+            val viewModel: RegistrationViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            LaunchedEffect(uiState) {
+                if (uiState is RegistrationUiState.Success) {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                    }
+                }
+            }
+
+            RegistrationScreen(
+                uiState = uiState,
+                onRegister = viewModel::register,
+                onNavigateToLogin = { navController.popBackStack() },
+                onDismissError = viewModel::resetState
+            )
+        }
+
+        composable(Screen.Login.route) {
+            val viewModel: LoginViewModel = hiltViewModel()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            LaunchedEffect(uiState) {
+                if (uiState is LoginUiState.Success) {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                    }
+                }
+            }
+
+            LoginScreen(
+                uiState = uiState,
+                onLogin = viewModel::login,
+                onNavigateToRegister = {
+                    navController.navigate(Screen.Register.route) {
+                        launchSingleTop = true
+                    }
+                },
+                onDismissError = viewModel::resetState
+            )
+        }
+
         composable(Screen.Home.route) {
             val viewModel: HomeViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -86,20 +137,22 @@ fun NavGraph(
                 }
             )
         }
+
         composable(Screen.Habit.route) {
-            val viewModel: HabitsViewModel = hiltViewModel()
+            val viewModel: HabitViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            HabitScreen(
+            HabitsScreen(
                 uiState = uiState,
                 onSearchQueryChange = viewModel::setSearchQuery,
                 onListFilterChange = viewModel::setListFilter,
                 onSortAlphabeticallyChange = viewModel::setSortAlphabetically,
                 onToggleHabitCompleted = viewModel::toggleHabitCompleted,
                 onNavigateToDetails = { h ->
-                    navController.navigate(Screen.HabitDetails.createRoute(h.id, h.title))
+                    navController.navigate(Screen.EditHabit.createRoute(h.id))
                 }
             )
         }
+
         composable(Screen.AddHabit.route) {
             val viewModel: AddHabitViewModel = hiltViewModel()
             AddHabitScreen(
@@ -113,19 +166,19 @@ fun NavGraph(
                 onCancel = { navController.popBackStack() }
             )
         }
+
         composable(
-            route = Screen.HabitDetails.route,
+            route = Screen.EditHabit(0).route,
             arguments = listOf(
-                navArgument("id") { type = NavType.IntType },
-                navArgument("title") { type = NavType.StringType }
+                navArgument("habitId") { type = NavType.IntType }
             )
         ) {
-            val viewModel: HabitDetailsViewModel = hiltViewModel()
+            val viewModel: EditHabitViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             LaunchedEffect(uiState) {
                 val s = uiState
-                if (s is HabitDetailsUiState.Error && s.popBack) {
+                if (s is EditHabitUiState.Error && s.popBack) {
                     navController.popBackStack()
                 }
             }
@@ -133,7 +186,7 @@ fun NavGraph(
             LaunchedEffect(viewModel) {
                 viewModel.effects.collect { effect ->
                     when (effect) {
-                        HabitDetailsEffect.Deleted -> {
+                        EditHabitNavigationEvent.Deleted -> {
                             snackbarHostState.showSnackbar(snackbarDeletedMessage)
                             navController.popBackStack()
                         }
@@ -142,14 +195,14 @@ fun NavGraph(
             }
 
             when (val s = uiState) {
-                is HabitDetailsUiState.Success ->
-                    HabitDetailsScreen(
+                is EditHabitUiState.Success ->
+                    EditHabitScreen(
                         habit = s.habit,
                         isMutationInProgress = s.isMutationInProgress,
                         onToggleCompleted = viewModel::toggleCompleted,
                         onDelete = viewModel::deleteHabit
                     )
-                is HabitDetailsUiState.Error ->
+                is EditHabitUiState.Error ->
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
                             if (s.popBack && s.message.isEmpty()) {
@@ -159,13 +212,14 @@ fun NavGraph(
                             }
                         )
                     }
-                HabitDetailsUiState.Init,
-                HabitDetailsUiState.Loading ->
+                EditHabitUiState.Init,
+                EditHabitUiState.Loading ->
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
                     }
             }
         }
+
         composable(Screen.Profile.route) {
             val viewModel: ProfileViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -174,6 +228,14 @@ fun NavGraph(
                     ProfileScreen(
                         completedHabitsCount = s.completedHabits,
                         totalHabitsCount = s.totalHabits,
+                        userEmail = s.userEmail,
+                        onLogout = {
+                            onLogout()
+                            navController.navigate(Screen.Login.route) {
+                                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                                launchSingleTop = true
+                            }
+                        },
                         onOpenAbout = {
                             navController.navigate(Screen.About.route) {
                                 launchSingleTop = true
@@ -196,6 +258,7 @@ fun NavGraph(
                     }
             }
         }
+
         composable(Screen.About.route) {
             val viewModel: AboutViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -217,6 +280,7 @@ fun NavGraph(
                     }
             }
         }
+
         composable(Screen.Settings.route) {
             val viewModel: SettingsViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()

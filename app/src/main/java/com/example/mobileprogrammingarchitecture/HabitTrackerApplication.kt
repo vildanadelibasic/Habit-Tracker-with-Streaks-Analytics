@@ -1,7 +1,7 @@
 package com.example.mobileprogrammingarchitecture
 
 import android.app.Application
-import com.example.mobileprogrammingarchitecture.data.model.local.DatabaseSeeder
+import com.example.mobileprogrammingarchitecture.model.util.DatabaseSeeder
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

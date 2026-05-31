@@ -34,14 +34,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mobileprogrammingarchitecture.R
-import com.example.mobileprogrammingarchitecture.data.model.HabitSampleDefaults
+import com.example.mobileprogrammingarchitecture.domain.data.HabitSampleDefaults
 import com.example.mobileprogrammingarchitecture.presentation.theme.HabitTrackerPreviewTheme
-import com.example.mobileprogrammingarchitecture.presentation.ui.components.home.HomeShortcutItem
-import com.example.mobileprogrammingarchitecture.presentation.ui.components.home.HomeTipRowItem
-import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.util.HomeProgressSection
-import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.util.HomeShortcut
-import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.util.ShortcutTarget
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.HomeUiState
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.components.HomeShortcutItem
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.components.HomeTipRowItem
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.components.HomeProgressSection
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.components.HomeShortcut
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.components.ShortcutTarget
+import com.example.mobileprogrammingarchitecture.presentation.view_model.home.HomeUiState
 
 @Composable
 fun HomeScreen(
@@ -83,6 +83,7 @@ fun HomeScreen(
 
             HomeScreenContent(
                 isRefreshing = s.isRefreshing,
+                networkMessage = s.networkMessage,
                 onRefresh = onRefresh,
                 completedCount = completedCount,
                 totalHabitCount = habits.size,
@@ -117,6 +118,7 @@ fun HomeScreen(
 @Composable
 private fun HomeScreenContent(
     isRefreshing: Boolean,
+    networkMessage: String?,
     onRefresh: () -> Unit,
     completedCount: Int,
     totalHabitCount: Int,
@@ -169,6 +171,15 @@ private fun HomeScreenContent(
                     )
                 }
             }
+        }
+
+        networkMessage?.let { message ->
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(top = 8.dp)
+            )
         }
 
         Spacer(modifier = Modifier.height(20.dp))

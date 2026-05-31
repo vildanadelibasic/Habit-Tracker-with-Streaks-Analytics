@@ -2,7 +2,6 @@ package com.example.mobileprogrammingarchitecture.presentation.ui.screens.settin
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -20,8 +19,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mobileprogrammingarchitecture.R
 import com.example.mobileprogrammingarchitecture.presentation.theme.HabitTrackerPreviewTheme
-import com.example.mobileprogrammingarchitecture.data.model.ThemePreference
-import com.example.mobileprogrammingarchitecture.presentation.ui.components.habits.HabitFilterChipItem
+import com.example.mobileprogrammingarchitecture.domain.data.ThemePreference
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.settings.components.SettingsThemeChipItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,27 +73,21 @@ private fun SettingsScreenContent(
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(bottom = 12.dp)
             )
-            HabitFilterChipItem(
+            SettingsThemeChipItem(
                 label = stringResource(R.string.settings_theme_system),
                 selected = themePreference == ThemePreference.System,
-                onClick = { onThemePreferenceChange(ThemePreference.System) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp)
+                onClick = { onThemePreferenceChange(ThemePreference.System) }
             )
-            HabitFilterChipItem(
+            SettingsThemeChipItem(
                 label = stringResource(R.string.settings_theme_light),
                 selected = themePreference == ThemePreference.Light,
-                onClick = { onThemePreferenceChange(ThemePreference.Light) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp)
+                onClick = { onThemePreferenceChange(ThemePreference.Light) }
             )
-            HabitFilterChipItem(
+            SettingsThemeChipItem(
                 label = stringResource(R.string.settings_theme_dark),
                 selected = themePreference == ThemePreference.Dark,
                 onClick = { onThemePreferenceChange(ThemePreference.Dark) },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.padding(bottom = 0.dp)
             )
         }
     }

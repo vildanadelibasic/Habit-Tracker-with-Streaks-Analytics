@@ -9,7 +9,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import com.example.mobileprogrammingarchitecture.data.model.ThemePreference
+import com.example.mobileprogrammingarchitecture.domain.data.ThemePreference
 
 private val LightColorScheme = lightColorScheme(
     primary = RosePrimary,
