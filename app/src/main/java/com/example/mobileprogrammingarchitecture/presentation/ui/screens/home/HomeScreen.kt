@@ -36,12 +36,12 @@ import androidx.compose.ui.unit.dp
 import com.example.mobileprogrammingarchitecture.R
 import com.example.mobileprogrammingarchitecture.domain.data.HabitSampleDefaults
 import com.example.mobileprogrammingarchitecture.presentation.theme.HabitTrackerPreviewTheme
-import com.example.mobileprogrammingarchitecture.presentation.ui.components.home.HomeShortcutItem
-import com.example.mobileprogrammingarchitecture.presentation.ui.components.home.HomeTipRowItem
-import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.util.HomeProgressSection
-import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.util.HomeShortcut
-import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.util.ShortcutTarget
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.HomeUiState
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.components.HomeShortcutItem
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.components.HomeTipRowItem
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.components.HomeProgressSection
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.components.HomeShortcut
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.components.ShortcutTarget
+import com.example.mobileprogrammingarchitecture.presentation.view_model.home.HomeUiState
 
 @Composable
 fun HomeScreen(

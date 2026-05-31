@@ -5,14 +5,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -27,8 +23,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.mobileprogrammingarchitecture.R
-import com.example.mobileprogrammingarchitecture.presentation.util.Validation
-import com.example.mobileprogrammingarchitecture.presentation.viewmodel.uistate.LoginUiState
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.auth.components.AuthHeader
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.auth.components.AuthPrimaryButton
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.auth.components.AuthTextField
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.auth.components.PasswordTextField
+import com.example.mobileprogrammingarchitecture.presentation.util.AuthValidators
+import com.example.mobileprogrammingarchitecture.presentation.view_model.auth.login.LoginUiState
 
 @Composable
 fun LoginScreen(
@@ -41,8 +41,8 @@ fun LoginScreen(
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
 
-    val emailError = Validation.validateEmail(email)
-    val passwordError = Validation.validatePassword(password)
+    val emailError = AuthValidators.validateEmail(email)
+    val passwordError = AuthValidators.validatePassword(password)
     val canSubmit = emailError == null && passwordError == null
 
     when (uiState) {
@@ -105,11 +105,9 @@ private fun LoginForm(
             .padding(24.dp),
         verticalArrangement = Arrangement.Center
     ) {
-        Text(stringResource(R.string.login_title), style = MaterialTheme.typography.headlineMedium)
-        Text(
-            stringResource(R.string.login_subtitle),
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)
+        AuthHeader(
+            title = stringResource(R.string.login_title),
+            subtitle = stringResource(R.string.login_subtitle)
         )
         if (bannerError != null) {
             Text(
@@ -122,29 +120,27 @@ private fun LoginForm(
                 Text(stringResource(R.string.action_dismiss_error))
             }
         }
-        OutlinedTextField(
+        AuthTextField(
             value = email,
             onValueChange = onEmailChange,
-            label = { Text(stringResource(R.string.login_email_label)) },
-            isError = emailError != null,
-            supportingText = emailError?.let { { Text(it) } },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            modifier = Modifier.fillMaxWidth()
+            label = stringResource(R.string.login_email_label),
+            error = emailError,
+            keyboardType = KeyboardType.Email
         )
         Spacer(Modifier.height(12.dp))
-        OutlinedTextField(
+        PasswordTextField(
             value = password,
             onValueChange = onPasswordChange,
-            label = { Text(stringResource(R.string.login_password_label)) },
-            visualTransformation = PasswordVisualTransformation(),
-            isError = passwordError != null,
-            supportingText = passwordError?.let { { Text(it) } },
-            modifier = Modifier.fillMaxWidth()
+            label = stringResource(R.string.login_password_label),
+            error = passwordError,
+            visualTransformation = PasswordVisualTransformation()
         )
         Spacer(Modifier.height(24.dp))
-        Button(onClick = onLogin, enabled = canSubmit, modifier = Modifier.fillMaxWidth()) {
-            Text(stringResource(R.string.login_submit))
-        }
+        AuthPrimaryButton(
+            text = stringResource(R.string.login_submit),
+            enabled = canSubmit,
+            onClick = onLogin
+        )
         TextButton(onClick = onNavigateToRegister, modifier = Modifier.align(Alignment.CenterHorizontally)) {
             Text(stringResource(R.string.login_go_register))
         }

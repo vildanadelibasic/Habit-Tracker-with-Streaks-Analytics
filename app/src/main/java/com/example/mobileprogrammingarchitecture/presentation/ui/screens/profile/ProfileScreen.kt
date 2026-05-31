@@ -19,9 +19,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mobileprogrammingarchitecture.R
 import com.example.mobileprogrammingarchitecture.presentation.theme.HabitTrackerPreviewTheme
-import com.example.mobileprogrammingarchitecture.presentation.ui.components.home.HomeTipRowItem
-import com.example.mobileprogrammingarchitecture.presentation.ui.components.profile.ProfileRowItem
-import com.example.mobileprogrammingarchitecture.presentation.ui.screens.profile.util.ProfileRowData
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.home.components.HomeTipRowItem
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.profile.components.ProfileRowItem
+import com.example.mobileprogrammingarchitecture.presentation.ui.screens.profile.components.ProfileRowData
 
 @Composable
 fun ProfileScreen(
